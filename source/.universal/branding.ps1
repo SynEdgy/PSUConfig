@@ -1,1 +1,1 @@
-﻿New-PSUBranding -Copyright "SynEdgy - All Rights Reserved" -LoginPageTheme "System" -AppBarLogo 'images/SynEdgy_logo_small.png' -AdminConsoleTitle ''
+﻿New-PSUBranding -Copyright "SynEdgy - All Rights Reserved" -LoginPageTheme "System" -AppBarLogo 'images/logo-big-text-white.png' -AdminConsoleTitle ''
