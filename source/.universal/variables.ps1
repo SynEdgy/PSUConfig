@@ -1,0 +1,1 @@
+﻿New-PSUVariable -Name "Variable" -Value 'foobar' -Description "TestVariable"

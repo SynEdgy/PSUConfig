@@ -1,0 +1,26 @@
+DatabasePath: $repository
+databaseFile: 'PSUConfig.db'
+version: 0.0.1
+schema:
+  Tables:
+    myUser:
+      columns:
+        id:
+          type: INTEGER
+          primaryKey: true
+          indexed: true
+        firstName:
+          type: TEXT
+        lastName:
+          type: TEXT
+        username:
+          type: TEXT
+        uid:
+          type: TEXT
+          # unique: true
+        email:
+          type: TEXT
+        createdOn:
+          type: TEXT
+        updatedOn:
+          type: TEXT
