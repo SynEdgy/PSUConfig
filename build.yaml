@@ -78,7 +78,10 @@ BuildWorkflow:
 
   import_secrets: |
     {
-      . .\secrets.local.ps1
+      if (Test-Path -Path 'secrets.local.ps1')
+      {
+        . .\secrets.local.ps1
+      }
     }
 
   pack:
