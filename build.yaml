@@ -57,7 +57,7 @@ NestedModule:
 #      PowerShell Universal Task Configuration     #
 ####################################################
 UniversalServer:
-  UniversalServerUrl: http://localhost:5000
+  # UniversalServerUrl: http://localhost:5000
   # UniversalServerAppToken: changeme
 
 
@@ -76,10 +76,16 @@ BuildWorkflow:
     - Build_NestedModules_ModuleBuilder
     - Create_changelog_release_output
 
+  import_secrets: |
+    {
+      . .\secrets.local.ps1
+    }
 
   pack:
     - build
+    - import_secrets
     - package_module_nupkg
+    - publish_packed_module_to_universal_server
 
 
 
