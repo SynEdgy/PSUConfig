@@ -12,6 +12,7 @@ CopyPaths:
   - .universal
   - images
   - config
+  - scripts
 #  - DSCResources
   # - Modules
 Encoding: UTF8

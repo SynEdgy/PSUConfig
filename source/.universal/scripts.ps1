@@ -2,3 +2,4 @@
 New-PSUScript -Environment "PSUConfig" -Module 'PSUConfig' -Command 'Initialize-PSUConfigDB'
 New-PSUScript -Environment "PSUConfig" -Module 'PSUConfig' -Command 'New-myUser'
 New-PSUScript -Environment "PSUConfig" -Module 'PSUConfig' -Command 'Get-myUser'
+New-PSUScript -Environment "PSUConfig" -Path 'scripts\Get-Process.ps1' -Description 'Get-Process.ps1' -Name 'Get-Process.ps1'
