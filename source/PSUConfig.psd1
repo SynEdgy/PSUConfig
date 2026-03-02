@@ -44,6 +44,9 @@ PowerShellVersion = '5.0'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
+    'powershell-yaml',
+    'synedgy.PSSqlite',
+    'synedgy.universal.helper'
 )
 
 # Assemblies that must be loaded prior to importing this module
@@ -103,14 +106,14 @@ PrivateData = @{
         ReleaseNotes = ''
 
         # Prerelease string of this module
-        Prerelease =  'preview2'
+        # Prerelease =  'preview2'
 
         # Flag to indicate whether the module requires explicit user acceptance for install/update/save
         # RequireLicenseAcceptance = $false
 
         # External dependent modules of this module
         ExternalModuleDependencies = @(
-            'synedgy.universal.helper'
+
         )
 
     } # End of PSData hashtable
