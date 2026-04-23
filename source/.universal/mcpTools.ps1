@@ -4,4 +4,4 @@ $newMcpToolParams = @{
     ScriptFullPath = "PSUConfig\New-MyUser"
 }
 
-New-PSUMCPTool @newMcpToolParams
+New-PsuMcpTool @newMcpToolParams

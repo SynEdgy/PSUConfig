@@ -13,6 +13,7 @@ CopyPaths:
   - images
   - config
   - scripts
+  - tests
 #  - DSCResources
   # - Modules
 Encoding: UTF8
@@ -32,10 +33,9 @@ VersionedOutputDirectory: true
 ####################################################
 
 NestedModule:
- "synedgy.universal.helper": # This is the first submodule to build into the output
-   Path: ./Output/RequiredModules/synedgy.universal.helper
-   #  is trimmed (remove metadata & Prerelease tag) and OutputDirectory expanded (the only one)
-   OutputDirectory: $BuiltModuleBase/Modules/synedgy.universal.helper
+ "powershell-yaml": # This is the first submodule to build into the output
+   Path: ./Output/RequiredModules/powershell-yaml
+   OutputDirectory: $BuiltModuleBase/Modules/powershell-yaml
    VersionedOutputDirectory: false
    AddToManifest: true
    CopyOnly: true
@@ -46,9 +46,16 @@ NestedModule:
    VersionedOutputDirectory: false
    AddToManifest: true
    CopyOnly: true
- "powershell-yaml": # This is the first submodule to build into the output
-   Path: ./Output/RequiredModules/powershell-yaml
-   OutputDirectory: $BuiltModuleBase/Modules/powershell-yaml
+ "synedgy.universal.helper": # This is the first submodule to build into the output
+   Path: ./Output/RequiredModules/synedgy.universal.helper
+   #  is trimmed (remove metadata & Prerelease tag) and OutputDirectory expanded (the only one)
+   OutputDirectory: $BuiltModuleBase/Modules/synedgy.universal.helper
+   VersionedOutputDirectory: false
+   AddToManifest: true
+   CopyOnly: true
+ "pester": # This is the first submodule to build into the output
+   Path: ./Output/RequiredModules/pester
+   OutputDirectory: $BuiltModuleBase/Modules/pester
    VersionedOutputDirectory: false
    AddToManifest: true
    CopyOnly: true
@@ -89,8 +96,10 @@ BuildWorkflow:
     - build
     - import_secrets
     - package_module_nupkg
-    - publish_packed_module_to_universal_server
+    # - publish_packed_module_to_universal_server
 
+  deploy:
+    - publish_packed_module_to_universal_server
 
 
   # Defining test task to be run when invoking `./build.ps1 -Tasks test`

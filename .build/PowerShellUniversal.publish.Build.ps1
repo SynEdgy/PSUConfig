@@ -68,7 +68,11 @@ task publish_packed_module_to_universal_server {
     }
 
     Write-Build -Color 'DarkGray' -Text "Publishing module to Universal Automation"
-    $response = Invoke-WebRequest -Uri "$universalServerUrl/api/v1/deployment?asModule=true" -Headers @{
+    # $response = Invoke-WebRequest -Uri "$universalServerUrl/api/v1/deployment?asModule=true" -Headers @{
+    #     "Authorization" = "Bearer $UniversalServerAppToken"
+    # } -InFile $builtNupkgPath -Method Put -ContentType "application/octet-stream"
+    $endpointUrl = "$UniversalServerUrl/api/v1/deployment/module/$ProjectName/$ModuleVersion?repository=output&synchronous=true"
+    $response = Invoke-WebRequest -Uri $endpointUrl -Headers @{
         "Authorization" = "Bearer $UniversalServerAppToken"
     } -InFile $builtNupkgPath -Method Put -ContentType "application/octet-stream"
 
