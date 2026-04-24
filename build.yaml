@@ -95,7 +95,8 @@ BuildWorkflow:
   pack:
     - build
     - import_secrets
-    - package_module_nupkg
+    # - package_module_nupkg
+    - package_psresource_nupkg
     # - publish_packed_module_to_universal_server
 
   deploy:
