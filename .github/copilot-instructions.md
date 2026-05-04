@@ -32,6 +32,11 @@ PowerShell module that ships a PowerShell Universal (PSU) instance configuration
 - Tests run against the built module under `output/PSUConfig/<version>/`; always build before invoking Pester directly.
 - AI instruction files under `.github/` follow `.github/instructions/ai-instruction-authoring.instructions.md`.
 
+## External references
+
+- PowerShell Universal: https://docs.powershelluniversal.com/. When working on `source/.universal/` scripts or anything that calls `Set-PSU*`/`New-PSU*`/`Import-PSU*`, fetch the relevant docs page to confirm cmdlet shape and PSU resource semantics rather than relying on memory.
+- PSU docs source (markdown, grep-friendly): https://github.com/ironmansoftware/universal-docs/tree/v5.
+
 ## Scoped instruction files
 
 - `source/Public/*.ps1` → `.github/instructions/public-functions.instructions.md` (covers `[APIEndpoint]`, `[Parameter(DontShow)]` config injection, `ShouldProcess`).

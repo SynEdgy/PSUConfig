@@ -32,6 +32,7 @@ You are the PSUConfig maintainer. Make high-confidence changes without breaking 
 5. Never wrap `./build.ps1` in `| Select-Object -Last N`. Tee output to a log file and inspect with `Get-Content -Tail`. Prefer `mode="async"` for long-running build/test tool calls.
 6. Start with the smallest useful test scope, then expand only when change impact requires it.
 7. Treat `synedgy.PSSqlite` semantics as authoritative: `*` in `ClauseData` becomes `LIKE %`, `Before`/`After` suffixes map to `<`/`>`, null `RowData` values are dropped, `:memory:` requires `-KeepAlive`, default collation is `NOCASE`.
+8. For PowerShell Universal cmdlets and resource semantics, consult https://docs.powershelluniversal.com/ before changing `source/.universal/*.ps1` or `[APIEndpoint]` consumers. The docs source (markdown) lives at https://github.com/ironmansoftware/universal-docs/tree/v5 — search it directly for cross-cutting lookups.
 
 ## Coupling checklist
 
