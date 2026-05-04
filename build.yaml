@@ -67,7 +67,9 @@ NestedModule:
 UniversalServer:
   # UniversalServerUrl: http://localhost:5000
   # UniversalServerAppToken: changeme
-
+  # UniversalPSResourceRepositoryName: psuconfig-output
+  # UniversalPSResourceRepositoryUrl: ./output/
+  # UniversalPSResourceRepositoryAutoRemove: true
 
 ####################################################
 #       Sampler Pipeline Configuration             #
@@ -100,7 +102,7 @@ BuildWorkflow:
     # - publish_packed_module_to_universal_server
 
   deploy:
-    - publish_packed_module_to_universal_server
+    - publish_module_from_psresource_repos_to_universal_server
 
 
   # Defining test task to be run when invoking `./build.ps1 -Tasks test`
@@ -183,6 +185,8 @@ ModuleBuildTasks:
     - '*.build.Sampler.ib.tasks'
   Sampler.GitHubTasks:
     - '*.ib.tasks'
+  DscResource.DocGenerator:
+    - 'Task.*'
 
 
 # Invoke-Build Header to be used to 'decorate' the terminal output of the tasks.

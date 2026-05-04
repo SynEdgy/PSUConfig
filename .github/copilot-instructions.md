@@ -45,6 +45,8 @@ PowerShell module that ships a PowerShell Universal (PSU) instance configuration
 - `source/config/*.PSSqliteConfig.y*ml` → `.github/instructions/sqlite-config.instructions.md` (schema YAML mapping to `[SqliteTable]`/`[SqliteColumn]`, `_metadata` versioning, migration modes).
 - `source/{Public,Private}/**/*.ps1` → `.github/instructions/data-access.instructions.md` (`synedgy.PSSqlite` CRUD usage: `ClauseData` semantics, wildcards, `Before`/`After` suffixes, connection lifetime).
 - `tests/**/*.Tests.ps1` → `.github/instructions/test-writing.instructions.md` (Pester 5 blueprint, mocking, assertion style).
+- `**/*.ps1` → `.github/instructions/http-conventions.instructions.md` (`Invoke-WebRequest`/`Invoke-RestMethod` content-type, headers, URL escaping).
+- `**/*.ps1` → `.github/instructions/powershell-style.instructions.md` (brace placement, blank-line rules around `}`, `param()` spacing, indentation).
 
 ## Skills
 
