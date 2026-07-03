@@ -4,50 +4,91 @@ PowerShell module that ships a PowerShell Universal (PSU) instance configuration
 
 ## Build / Test / Deploy
 
-- Resolve dependencies into `output/RequiredModules/` and run default workflow (`build`, `test`):
-  - `./build.ps1 -ResolveDependency`
+- Use `./build.ps1` as the only entry point for build, test, and environment setup.
+- Do not call `Build-Module`, `Invoke-Pester`, or `Invoke-Build` directly.
+- Do not manually modify `PSModulePath`.
+- Resolve dependencies and run the default workflow: `./build.ps1 -ResolveDependency`
+- Bootstrap dependencies only: `./build.ps1 -ResolveDependency -Tasks noop`
 - Build only: `./build.ps1 -Tasks build`
 - Run all Pester tests: `./build.ps1 -Tasks test`
-- Run a single test file directly (after a build, so the module exists in `output/`):
-  - `Invoke-Pester -Path ./tests/QA/module.tests.ps1 -Output Detailed`
-- Pack as nupkg and deploy to a PSU instance:
-  - `. ./secrets.local.ps1; ./build.ps1 -Tasks build,pack,deploy`
-- `secrets.local.ps1` (gitignored) must set `$Env:UniversalServerUrl` and `$Env:UniversalServerAppToken` for `deploy`.
-- Code-coverage threshold is set in `build.yaml` under `Pester.CodeCoverageThreshold` (currently `1`).
+- Run a focused test: `./build.ps1 -Tasks test -PesterPath 'tests/Unit/Public/MyFunction.Tests.ps1' -CodeCoverageThreshold 0`
+- Run the quality gate: `./build.ps1 -Tasks hqrmtest`
+- Pack explicitly before deployment:
+  ```powershell
+  . ./secrets.local.ps1
+  ./build.ps1 -Tasks pack
+  ./build.ps1 -Tasks deploy
+  ```
+- `secrets.local.ps1` is gitignored and must set `$Env:UniversalServerUrl` and `$Env:UniversalServerAppToken`.
+- Code coverage is configured in `build.yaml` under `Pester.CodeCoverageThreshold`.
+
+## Git workflow
+
+- Never commit, push, tag, or publish on behalf of the user.
 
 ## Architecture
 
-- `source/` is the ModuleBuilder source. `PSUConfig.psm1` is regenerated at build; do not put runtime code there. Use `source/prefix.ps1` for module-scoped state (e.g. `$script:MyModuleDBConfig`).
-- Public functions in `source/Public/` are auto-exported. Private helpers in `source/Private/` are not. New files added here are picked up automatically.
-- Built module is emitted to `output/<ModuleName>/<version>/module/` (`BuiltModuleSubdirectory: module`, `VersionedOutputDirectory: true`).
-- `build.yaml` `CopyPaths` copies `en-US`, `.universal`, `images`, `config`, `scripts`, `tests` from `source/` into the built module verbatim.
-- `NestedModule` in `build.yaml` bundles `powershell-yaml`, `synedgy.PSSqlite`, `synedgy.universal.helper`, and `pester` from `output/RequiredModules/` into `<built>/Modules/` and adds them to the manifest.
-- `source/.universal/` holds PSU configuration scripts (`authentication.ps1`, `endpoints.ps1`, `environments.ps1`, `roles.ps1`, `scripts.ps1`, `triggers.ps1`, `variables.ps1`, etc.). These are consumed by the target PSU instance after deploy, not by the module at import time.
-- `source/.universal/endpoints.ps1` imports the module then calls `Import-PSUEndpoint -Module PSUConfig` (from `synedgy.universal.helper`) to publish any function decorated with `[APIEndpoint(...)]` as a PSU REST endpoint. See `source/Public/Get-Something.ps1` for the attribute pattern.
-- SQLite config lives in `source/config/PSUConfig.PSSqliteConfig.yml`. `Get-myModuleConfig` (Private) loads it via `synedgy.PSSqlite`'s `Get-PSSqliteDBConfigFile` / `Get-PSSqliteDBConfig`, caches it in `$script:MyModuleDBConfig`, and `Initialize-PSUConfigDB` applies it with `Initialize-PSSqliteDatabase`. New tables go in the YAML `schema.Tables` block.
+- `source/` is the ModuleBuilder source. `PSUConfig.psm1` is generated; do not edit it directly.
+- Use `source/prefix.ps1` for module-scoped state such as `$script:MyModuleDBConfig`.
+- Public functions in `source/Public/` are auto-exported. Private helpers in `source/Private/` are not.
+- The built module is emitted beneath `output/PSUConfig/<version>/`.
+- `build.yaml` `CopyPaths` copies runtime assets from `source/` into the built module.
+- `NestedModule` bundles declared dependencies from `output/RequiredModules/` into the built module's `Modules/` folder.
+- `source/.universal/` contains PSU configuration scripts consumed after deployment, not during module import.
+- `source/.universal/endpoints.ps1` imports attributed endpoints through `Import-PSUEndpoint -Module PSUConfig`.
+- SQLite configuration lives in `source/config/PSUConfig.PSSqliteConfig.yml`.
+- `Get-myModuleConfig` loads and caches the SQLite config; `Initialize-PSUConfigDB` applies it.
+
+## Deployment safety
+
+- Never modify PSU's live Repository folder directly.
+- Only `./build.ps1 -Tasks deploy` may update the live repository.
+- Run `./build.ps1 -Tasks pack` explicitly before deploy; do not rely only on deploy prerequisites.
 
 ## Conventions
 
-- Versioning is driven by GitVersion (`GitVersion.yml`); do not bump `ModuleVersion` in `source/PSUConfig.psd1` manually.
-- Tests run against the built module under `output/PSUConfig/<version>/`; always build before invoking Pester directly.
-- AI instruction files under `.github/` follow `.github/instructions/ai-instruction-authoring.instructions.md`.
+- Versioning is driven by GitVersion; do not manually bump `source/PSUConfig.psd1`.
+- Tests run against the built module, not directly against `source/`.
+- Update `CHANGELOG.md` only for user-visible behavior changes under `## [Unreleased]`.
+- Do not add changelog entries for CI, pipeline, or tooling-only changes.
+- Use ASCII in `.ps1` files and `CHANGELOG.md`.
+- Prefer splatting over backtick continuation.
+- Use `$null = <expression>` rather than piping to `Out-Null`.
+- Use explicit .NET types and DSC Community parameter layout.
+- Build multi-level paths with chained `Join-Path` calls; do not embed separators in `-ChildPath`.
+- Follow `.github/instructions/ai-instruction-authoring.instructions.md` when editing AI guidance.
+
+## Long-running commands
+
+- Tee build output to `output/agentic/`, which survives the Clean task:
+  ```powershell
+  $null = New-Item -Path 'output/agentic' -ItemType Directory -Force
+  ./build.ps1 -Tasks test 2>&1 |
+      Tee-Object -FilePath 'output/agentic/test.log'
+  ```
+- Inspect progress with `Get-Content output/agentic/test.log -Tail 20`; do not rerun a still-running build.
 
 ## External references
 
-- PowerShell Universal: https://docs.powershelluniversal.com/. When working on `source/.universal/` scripts or anything that calls `Set-PSU*`/`New-PSU*`/`Import-PSU*`, fetch the relevant docs page to confirm cmdlet shape and PSU resource semantics rather than relying on memory.
-- PSU docs source (markdown, grep-friendly): https://github.com/ironmansoftware/universal-docs/tree/v5.
+- PowerShell Universal: https://docs.powershelluniversal.com/
+- PSU docs source: https://github.com/ironmansoftware/universal-docs/tree/v5
+- Confirm PSU cmdlet signatures and resource semantics from the documentation before changing `.universal` scripts.
 
 ## Scoped instruction files
 
-- `source/Public/*.ps1` → `.github/instructions/public-functions.instructions.md` (covers `[APIEndpoint]`, `[Parameter(DontShow)]` config injection, `ShouldProcess`).
-- `source/Private/*.ps1` → `.github/instructions/private-functions.instructions.md` (covers module-scoped state in `prefix.ps1`, cache patterns).
-- `source/.universal/*.ps1` → `.github/instructions/universal-scripts.instructions.md` (PSU resource scripts: idempotency, endpoint registration, role alignment).
-- `source/config/*.PSSqliteConfig.y*ml` → `.github/instructions/sqlite-config.instructions.md` (schema YAML mapping to `[SqliteTable]`/`[SqliteColumn]`, `_metadata` versioning, migration modes).
-- `source/{Public,Private}/**/*.ps1` → `.github/instructions/data-access.instructions.md` (`synedgy.PSSqlite` CRUD usage: `ClauseData` semantics, wildcards, `Before`/`After` suffixes, connection lifetime).
-- `tests/**/*.Tests.ps1` → `.github/instructions/test-writing.instructions.md` (Pester 5 blueprint, mocking, assertion style).
-- `**/*.ps1` → `.github/instructions/http-conventions.instructions.md` (`Invoke-WebRequest`/`Invoke-RestMethod` content-type, headers, URL escaping).
-- `**/*.ps1` → `.github/instructions/powershell-style.instructions.md` (brace placement, blank-line rules around `}`, `param()` spacing, indentation).
+- `source/Public/**/*.ps1` -> `.github/instructions/public-functions.instructions.md`
+- `source/Private/**/*.ps1` -> `.github/instructions/private-functions.instructions.md`
+- `source/.universal/*.ps1` -> `.github/instructions/universal-scripts.instructions.md`
+- `source/config/*.PSSqliteConfig.y*ml` -> `.github/instructions/sqlite-config.instructions.md`
+- `source/{Public,Private}/**/*.ps1` -> `.github/instructions/data-access.instructions.md`
+- `tests/**/*.Tests.ps1` -> `.github/instructions/test-writing.instructions.md`
+- `**/*.ps1` -> `.github/instructions/http-conventions.instructions.md`
+- `**/*.ps1` -> `.github/instructions/powershell-style.instructions.md`
+- Build task files -> `.github/instructions/build-task-files.instructions.md` and `.github/instructions/build-tasks.instructions.md`
+- Classes and enums -> `.github/instructions/classes-and-type-accelerators.instructions.md`
+- PSU resources -> `.github/instructions/powershell-universal.instructions.md`
+- Wiki publishing -> `.github/instructions/wiki-publishing.instructions.md`
 
 ## Skills
 
-- `.github/skills/validate-changes/SKILL.md` — decision flow for picking the smallest useful test scope, streaming `./build.ps1` output via `Tee-Object`, and parsing failures from `output/testResults/NUnitXml_PSUConfig_*.xml`. Follow it before opening or updating a PR.
+- `.github/skills/validate-changes/SKILL.md` defines targeted and full validation workflows. Follow it before opening or updating a PR.
