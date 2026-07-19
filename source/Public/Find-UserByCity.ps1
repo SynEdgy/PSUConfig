@@ -23,6 +23,9 @@ function Find-UserByCity
             System.Object. The user objects returned by the dummyjson.com API.
     #>
     [CmdletBinding()]
+    [AiTool(
+        Description = 'Finds users by city'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]

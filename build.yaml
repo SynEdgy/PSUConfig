@@ -1,4 +1,8 @@
 ---
+WorkspaceModules:
+  - synedgy.universal.helper
+  - synedgy.PSSqlite
+
 ####################################################
 #          ModuleBuilder Configuration             #
 ####################################################
@@ -12,6 +16,7 @@ CopyPaths:
   - .universal
   - images
   - config
+  - Apps
   - scripts
   - tests
 #  - DSCResources
@@ -32,34 +37,10 @@ VersionedOutputDirectory: true
 #      ModuleBuilder Submodules Configuration      #
 ####################################################
 
-NestedModule:
- "powershell-yaml": # This is the first submodule to build into the output
-   Path: ./Output/RequiredModules/powershell-yaml
-   OutputDirectory: $BuiltModuleBase/Modules/powershell-yaml
-   VersionedOutputDirectory: false
-   AddToManifest: true
-   CopyOnly: true
- "synedgy.PSSqlite": # This is the first submodule to build into the output
-   Path: ./Output/RequiredModules/synedgy.PSSqlite
-   #  is trimmed (remove metadata & Prerelease tag) and OutputDirectory expanded (the only one)
-   OutputDirectory: $BuiltModuleBase/Modules/synedgy.PSSqlite
-   VersionedOutputDirectory: false
-   AddToManifest: true
-   CopyOnly: true
- "synedgy.universal.helper": # This is the first submodule to build into the output
-   Path: ./Output/RequiredModules/synedgy.universal.helper
-   #  is trimmed (remove metadata & Prerelease tag) and OutputDirectory expanded (the only one)
-   OutputDirectory: $BuiltModuleBase/Modules/synedgy.universal.helper
-   VersionedOutputDirectory: false
-   AddToManifest: true
-   CopyOnly: true
- "pester": # This is the first submodule to build into the output
-   Path: ./Output/RequiredModules/pester
-   OutputDirectory: $BuiltModuleBase/Modules/pester
-   VersionedOutputDirectory: false
-   AddToManifest: true
-   CopyOnly: true
-
+# NestedModule bundling has been removed: powershell-yaml, synedgy.PSSqlite,
+# and synedgy.universal.helper are now resolved as ordinary RequiredModules
+# (see source/PSUConfig.psd1), which also lets synedgy.universal.helper be
+# linked live from the workspace via WorkspaceModules during local builds.
 
 ####################################################
 #      PowerShell Universal Task Configuration     #
@@ -83,6 +64,7 @@ BuildWorkflow:
   build:
     - Clean
     - Build_Module_ModuleBuilder
+    - Link_Local_Workspace_Dependencies
     - Build_NestedModules_ModuleBuilder
     - Create_changelog_release_output
 
@@ -97,13 +79,13 @@ BuildWorkflow:
   pack:
     - build
     - import_secrets
+    - Link_Local_Workspace_Dependencies
     # - package_module_nupkg
     - package_psresource_nupkg
     # - publish_packed_module_to_universal_server
 
   deploy:
     - publish_module_from_psresource_repos_to_universal_server
-
 
   # Defining test task to be run when invoking `./build.ps1 -Tasks test`
   test:
@@ -125,6 +107,11 @@ BuildWorkflow:
     - Publish_GitHub_Wiki_Content
 
     - publish_module_to_gallery
+
+  # Quality gate task, only runs when explicitly requested via `./build.ps1 -Tasks hqrmtest`.
+  # Not part of '.', build, test, pack, deploy, or publish workflows.
+  hqrmtest:
+    - Invoke_HQRM_Tests_Stop_On_Fail
 
 ####################################################
 #       PESTER  Configuration                      #
@@ -186,6 +173,8 @@ ModuleBuildTasks:
   Sampler.GitHubTasks:
     - '*.ib.tasks'
   DscResource.DocGenerator:
+    - 'Task.*'
+  DscResource.Test:
     - 'Task.*'
 
 

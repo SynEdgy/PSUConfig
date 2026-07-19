@@ -10,6 +10,9 @@ function New-myUser
         Role = ('admin','user'),
         Timeout = 30
     )]
+    [AiTool(
+        Description = 'Creates a new user in the PSUConfig database'
+    )]
     param
     (
         [Parameter(Mandatory = $true)]

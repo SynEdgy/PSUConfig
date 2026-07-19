@@ -41,6 +41,29 @@ applyTo: "{source/.universal/**/*.ps1,source/PSUConfig.psd1,build.yaml,.build/Po
 - `$Env:UniversalServerAppToken` and `$Env:UniversalServerUrl` are build/deploy-only variables (used for local publish via `secrets.local.ps1` and post-deploy checks). Never use them in PSU runtime code (scripts, apps, dashboards). In runtime, use a `$secret:` variable or another PSU-declared variable from `source/.universal/variables.ps1`.
 - Use `Invoke-RestMethod` for PSU API checks; do not use `curl`.
 
+## Job/script access authorization (AppToken vs -Integrated)
+
+- Prefer an app token via the Management API (`-AppToken`/`-ComputerName`) as the **primary** way
+  to read jobs/scripts from dashboard pages that display job info (e.g. `New-UDPsuJobHeader`,
+  `New-UDPsuJobTerminalView`). Use `-Integrated` only as a **fallback** when no token is
+  configured (e.g. quick local setup without secrets).
+- `-Integrated` bypasses PSU's Management API -- and therefore its role/permission checks --
+  entirely. Code using `-Integrated` can read/execute **any** job or script in the instance,
+  regardless of any role configuration. An app token, by contrast, is bound to whatever role it is
+  assigned, is revocable, and is auditable.
+- Caveat: today, the only permission that grants job-read access at all (`automation/read`) is
+  itself unscoped -- it grants read access to every job in the instance, not just jobs from a
+  specific script (see ComsolCentral's `docs/bug/bug-psu-no-per-script-job-read-permission.md`,
+  submitted to Devolutions and confirmed as being fixed). So switching to an app token does not
+  yet achieve per-script job scoping, but it is still the right default: it keeps access inside
+  PSU's authorization model (auditable, revocable, and forward-compatible once the scoped
+  job-read fix ships), whereas `-Integrated` sits outside that model entirely and would remain
+  unaffected even after that fix.
+- See `source/.universal/roles.ps1` (`psuconfig_automation_bot` role) and
+  `source/.universal/variables.ps1` (`psuconfig_automation_bot_token` secret variable) for the
+  scoped-token pattern, mirroring ComsolCentral's `comsol_automation_bot` role and
+  `comsol_automation_bot_token` secret.
+
 ## Database schema migrations
 
 - Schema migrations in INCREMENTAL mode only add missing tables or columns; they do not remove or

@@ -113,9 +113,21 @@ param
     $BuildInfo = (property BuildInfo @{ })
 )
 
+function Import-LocalBuildSecrets
+{
+    $secretsPath = Join-Path -Path $BuildRoot -ChildPath 'secrets.local.ps1'
+
+    if (Test-Path -Path $secretsPath)
+    {
+        . $secretsPath
+    }
+}
+
 # Synopsis: Upload the packed .nupkg directly to the PowerShell Universal deployment endpoint.
 task publish_packed_module_to_universal_server {
     . Set-SamplerTaskVariable
+    Import-LocalBuildSecrets
+
     "`tBuilt Module Subdirectory  = '{0}'" -f $OutputDirectory
     $builtNupkgPath = Join-Path -Path $OutputDirectory -ChildPath ('{0}.{1}.nupkg' -f $ProjectName, $ModuleVersion)
     "`tExpected nupkg file  = '{0}'" -f $builtNupkgPath
@@ -135,16 +147,22 @@ task publish_packed_module_to_universal_server {
        $UniversalServerUrl = $UniversalServer.UniversalServerUrl.TrimEnd('/')
     }
 
+    if ([string]::IsNullOrEmpty($UniversalServerUrl) -and -not [string]::IsNullOrEmpty($env:UniversalServerUrl))
+    {
+        $UniversalServerUrl = $env:UniversalServerUrl.TrimEnd('/')
+    }
+
     if ([string]::IsNullOrEmpty($UniversalServerAppToken) -and $UniversalServer.UniversalServerAppToken)
     {
        $UniversalServerAppToken = $UniversalServer.UniversalServerAppToken
     }
 
+    if ([string]::IsNullOrEmpty($UniversalServerAppToken) -and -not [string]::IsNullOrEmpty($env:UniversalServerAppToken))
+    {
+        $UniversalServerAppToken = $env:UniversalServerAppToken
+    }
+
     Write-Build -Color 'DarkGray' -Text "Publishing module to Universal Automation"
-    # $response = Invoke-WebRequest -Uri "$universalServerUrl/api/v1/deployment?asModule=true" -Headers @{
-    #     "Authorization" = "Bearer $UniversalServerAppToken"
-    # } -InFile $builtNupkgPath -Method Put -ContentType "application/octet-stream"
-    # $endpointUrl = "$UniversalServerUrl/api/v1/deployment/module/$ProjectName/$ModuleVersion?repository=output&synchronous=true"
     $endpointUrl = '{0}/api/v1/deployment/module/{1}/{2}?repository=output&synchronous=true' -f $UniversalServerUrl, $ProjectName, $ModuleVersion
     $publishParams = @{
         Uri         = $endpointUrl
@@ -170,6 +188,7 @@ task publish_packed_module_to_universal_server {
 # Synopsis: Reconcile a PSResourceRepository on the PSU server, then trigger a module install from it.
 task publish_module_from_psresource_repos_to_universal_server {
     . Set-SamplerTaskVariable
+    Import-LocalBuildSecrets
 
     $UniversalServer = $BuildInfo.UniversalServer
     if ([string]::IsNullOrEmpty($UniversalServerUrl) -and $UniversalServer.UniversalServerUrl)
@@ -177,11 +196,21 @@ task publish_module_from_psresource_repos_to_universal_server {
         $UniversalServerUrl = $UniversalServer.UniversalServerUrl
     }
 
+    if ([string]::IsNullOrEmpty($UniversalServerUrl) -and -not [string]::IsNullOrEmpty($env:UniversalServerUrl))
+    {
+        $UniversalServerUrl = $env:UniversalServerUrl
+    }
+
     $UniversalServerUrl = $UniversalServerUrl.TrimEnd('/')
 
     if ([string]::IsNullOrEmpty($UniversalServerAppToken) -and $UniversalServer.UniversalServerAppToken)
     {
         $UniversalServerAppToken = $UniversalServer.UniversalServerAppToken
+    }
+
+    if ([string]::IsNullOrEmpty($UniversalServerAppToken) -and -not [string]::IsNullOrEmpty($env:UniversalServerAppToken))
+    {
+        $UniversalServerAppToken = $env:UniversalServerAppToken
     }
 
     if ([string]::IsNullOrEmpty($UniversalServerAppToken))
