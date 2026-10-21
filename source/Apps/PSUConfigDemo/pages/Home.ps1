@@ -1,7 +1,7 @@
 New-UDPage -Name 'Home' -Url '/' -Content {
     New-UDMarkdown -Markdown (Get-Content -Raw -Path (Join-Path -Path (Get-UDAppPath) -ChildPath 'README.md'))
 
-    New-UDButton -Text 'Run demo job (Get-myUser)' -OnClick {
+    New-UDButton -Text 'Run demo job (Get-PSUConfigUser)' -OnClick {
         # Note: Invoke-PSUScript -Wait reliably returns a job object with an empty Id on
         # this PSU version (see docs/bug/bug-psu-invoke-psuscript-wait-empty-job-id.md in
         # ComsolCentral); omit -Wait, which reliably returns a populated Id immediately.
@@ -23,7 +23,7 @@ New-UDPage -Name 'Home' -Url '/' -Content {
             $commonParams['Integrated'] = $true
         }
 
-        $script = Get-PSUScript -Name 'PSUConfig\Get-myUser' @commonParams
+        $script = Get-PSUScript -Name 'PSUConfig\Get-PSUConfigUser' @commonParams
         $job = Invoke-PSUScript -Script $script @commonParams
 
         Invoke-UDRedirect -Url ('/job/{0}' -f $job.Id)

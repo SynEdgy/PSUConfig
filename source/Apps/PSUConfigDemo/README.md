@@ -8,7 +8,7 @@ components from `synedgy.universal.helper` (`New-UDPsuJobHeader` and
 
 ## Pages
 
-- `Home` (`/psuconfig-demo`): triggers the `Get-myUser` PSU script and links to
+- `Home` (`/psuconfig-demo`): triggers the `Get-PSUConfigUser` PSU script and links to
   its job detail page.
 - `Job Info` (`/psuconfig-demo/job/:id`): renders the job header and terminal
   output view for the given job id.

@@ -1,11 +1,11 @@
-function Set-myUser
+function Set-PSUConfigUser
 {
     <#
         .SYNOPSIS
             Updates a user record in the PSUConfig SQLite database.
 
         .DESCRIPTION
-            Updates the supplied fields on a single myUser table row and records the
+            Updates the supplied fields on a single psuConfigUser table row and records the
             current date and time as the row's latest modification timestamp.
 
         .PARAMETER id
@@ -24,7 +24,7 @@ function Set-myUser
             Specifies the replacement email address when that field should be updated.
 
         .EXAMPLE
-            Set-myUser -id 42 -Email 'ada@example.com' -Confirm:$false
+            Set-PSUConfigUser -id 42 -Email 'ada@example.com' -Confirm:$false
 
             Updates the email address and modification timestamp for user record 42.
     #>
@@ -67,7 +67,7 @@ function Set-myUser
     $null = $PSBoundParameters.Remove('id')
     $updatePSSqliteRowParameters = @{
         SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
-        TableName      = 'myUser'
+        TableName      = 'psuConfigUser'
         RowData        = $PSBoundParameters
         ClauseData     = @{
             id = $id
@@ -75,7 +75,7 @@ function Set-myUser
         Verbose        = $Verbose.IsPresent -or $VerbosePreference -in @('Continue', 'Inquire')
     }
 
-    if ($PSCmdlet.ShouldProcess([System.String]$id, 'Update myUser record'))
+    if ($PSCmdlet.ShouldProcess([System.String]$id, 'Update PSUConfig user record'))
     {
         Set-PSSqliteRow @updatePSSqliteRowParameters
     }

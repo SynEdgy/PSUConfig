@@ -1,11 +1,11 @@
-function New-myUser
+function New-PSUConfigUser
 {
     <#
         .SYNOPSIS
             Creates a user record in the PSUConfig SQLite database.
 
         .DESCRIPTION
-            Inserts a new row into the myUser table with the supplied identity
+            Inserts a new row into the psuConfigUser table with the supplied identity
             properties and records the current date and time as the creation value.
 
         .PARAMETER FirstName
@@ -21,15 +21,15 @@ function New-myUser
             Specifies the email address to store in the newly created user record.
 
         .EXAMPLE
-            New-myUser -FirstName 'Ada' -LastName 'Lovelace' -Username 'ada' -Email 'ada@example.com'
+            New-PSUConfigUser -FirstName 'Ada' -LastName 'Lovelace' -Username 'ada' -Email 'ada@example.com'
 
             Creates and returns a new user record when the operation is confirmed.
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
     [APIEndpoint(
-        Name = 'newmyUser',
-        Path = '/myUser',
-        Description = 'New myUser records from the local database.',
+        Name = 'newPSUConfigUser',
+        Path = '/psuConfigUser',
+        Description = 'Create PSUConfig user records in the local database.',
         Method = 'POST',
         Authentication = $false,
         Role = ('admin','user'),
@@ -71,12 +71,12 @@ function New-myUser
     $PSBoundParameters['createdOn'] = Get-Date
     $insertPSSqliteRowParameters = @{
         SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
-        TableName      = 'myUser'
+        TableName      = 'psuConfigUser'
         RowData        = $PSBoundParameters
         Verbose        = $Verbose.IsPresent -or $VerbosePreference -in @('Continue', 'Inquire')
     }
 
-    if ($PSCmdlet.ShouldProcess($Username, 'Create myUser record'))
+    if ($PSCmdlet.ShouldProcess($Username, 'Create PSUConfig user record'))
     {
         New-PSSqliteRow @insertPSSqliteRowParameters
     }

@@ -28,7 +28,7 @@ applyTo: "{source/.universal/**/*.ps1,source/PSUConfig.psd1,build.yaml,RequiredM
   fast, resources not registering), ask the user to restart the PowerShellUniversal service --
   do not attempt to restart Windows services yourself without explicit user action.
 - `Get-PSUScript -Name` requires the full `<ModuleName>\<Command>` path (e.g.
-  `'PSUConfig\Get-myUser'`), not just the command name -- scripts registered via
+  `'PSUConfig\Get-PSUConfigUser'`), not just the command name -- scripts registered via
   `New-PSUScript -Module ... -Command ...` are named `<Module>\<Command>`.
 - `Invoke-PSUScript -Integrated -Wait` reliably returns a job object with an empty `Id` on this
   PSU version (100% reproducible across 130 test invocations); omit `-Wait` when the job `Id` is

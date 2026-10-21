@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `PSUConfigDemo` app can read job status/output via a scoped app token (Management
   API) instead of `-Integrated`, which bypasses PSU's authorization model entirely.
   `-Integrated` remains a fallback when no token is configured.
-- Added `[AiTool()]` attributes to `Find-UserByCity` and `New-myUser`, and replaced
+- Added `[AiTool()]` attributes to `Find-UserByCity` and `New-PSUConfigUser`, and replaced
   `source/.universal/mcpTools.ps1` (which called the non-existent `New-PsuMcpTool`
   cmdlet) with a single `Import-PSUAiTool -Module PSUConfig -Environment "PSUConfig"`
   call, mirroring the existing `[APIEndpoint()]` / `Import-PSUEndpoint` pattern.
@@ -36,3 +36,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `WorkspaceModules` during local builds.
 - Updated the PSUConfig demo to resolve its management API URL from the active
   environment configuration, including live job-output refreshes.
+- Renamed the sample `myUser` table and CRUD surface to `psuConfigUser` and
+  `*-PSUConfigUser` to reflect that the records are internal to PSUConfig.
