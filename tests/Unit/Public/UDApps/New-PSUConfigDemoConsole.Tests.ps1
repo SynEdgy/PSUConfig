@@ -41,4 +41,23 @@ Describe 'New-PSUConfigDemoConsole' {
     It 'Should not build the app definition when -WhatIf is used' {
         PSUConfig\New-PSUConfigDemoConsole -WhatIf | Should -BeNullOrEmpty
     }
+
+    It 'Should bundle the SynEdgy visual assets' {
+        $appPath = PSUConfig\Get-UDAppPath
+        $assetPath = Join-Path -Path $appPath -ChildPath 'assets'
+
+        Test-Path -Path (Join-Path -Path $assetPath -ChildPath 'synedgy-logo.svg') | Should -BeTrue
+        Test-Path -Path (Join-Path -Path $assetPath -ChildPath 'powershell-cube.jpg') | Should -BeTrue
+    }
+
+    It 'Should provide separate light and dark PSU theme definitions' {
+        $appPath = PSUConfig\Get-UDAppPath
+        $themePath = Join-Path -Path $appPath -ChildPath 'theme.psd1'
+        $theme = Import-PowerShellDataFile -Path $themePath
+
+        $theme.Keys | Should -Contain 'light'
+        $theme.Keys | Should -Contain 'dark'
+        $theme.light.palette.background.default | Should -Not -BeNullOrEmpty
+        $theme.dark.palette.background.default | Should -Not -BeNullOrEmpty
+    }
 }

@@ -85,8 +85,9 @@ New-PSURole -Name 'psuconfig_automation_bot' -Description 'Role for the PSUConfi
     'automation.scripts/view'
     # NOTE: unverified -- ComsolCentral only demonstrates scoped permission strings
     # (automation.scripts.scripts\<name>/*) for -Path-registered scripts (e.g. user_trigger.ps1),
-    # not for -Module/-Command registered scripts like Get-PSUConfigUser. Confirm the correct permission
-    # string once the token is created and tested; this may need to reference 'PSUConfig\Get-PSUConfigUser'
+    # not for -Module/-Command registered scripts like Get-PSUConfigDatabaseAnalysis. Confirm the correct
+    # permission string once the token is created and tested; this may need to reference
+    # 'PSUConfig\Get-PSUConfigDatabaseAnalysis'
     # or a different qualifier entirely.
-    'automation.scripts.scripts\Get-PSUConfigUser/*'
+    'automation.scripts.scripts\Get-PSUConfigDatabaseAnalysis/*'
 )

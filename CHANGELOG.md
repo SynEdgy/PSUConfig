@@ -38,3 +38,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   environment configuration, including live job-output refreshes.
 - Renamed the sample `myUser` table and CRUD surface to `psuConfigUser` and
   `*-PSUConfigUser` to reflect that the records are internal to PSUConfig.
+- Redesigned the PSUConfig demo with SynEdgy branding and the SITF visual
+  language, centered on module-first PSU configuration and Sampler delivery,
+  with switchable dark and light themes.
+- Extracted reusable light/dark palettes, typography, shape, and component
+  overrides into a dedicated PSU MUI theme file.
+- Fixed dashboard cards to use explicit vertical layouts so descriptions render
+  below their titles at every responsive grid size.
+- Added `Get-PSUConfigDatabaseAnalysis` and a dashboard action that runs it as a
+  PSU job to report live table record counts and the stored SQLite schema version.

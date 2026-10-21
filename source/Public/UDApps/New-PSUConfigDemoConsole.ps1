@@ -6,9 +6,9 @@ function New-PSUConfigDemoConsole
 
         .DESCRIPTION
         Loads dashboard page scripts from the module app folder and composes the
-        PSUConfig demo dashboard navigation and page registration object. This app
-        demonstrates the shared job UI components from synedgy.universal.helper
-        (New-UDPsuJobHeader and New-UDPsuJobTerminalView).
+        SynEdgy-branded PSUConfig dashboard. The application demonstrates a
+        module-first PowerShell Universal configuration repository built, tested,
+        packaged, and deployed through the Sampler framework.
 
         .EXAMPLE
         New-PSUConfigDemoConsole -Confirm:$false
@@ -24,18 +24,43 @@ function New-PSUConfigDemoConsole
     $appPath = Join-Path -Path $moduleBase -ChildPath 'Apps'
     $appPath = Join-Path -Path $appPath -ChildPath 'PSUConfigDemo'
     $appPagesPath = Join-Path -Path $appPath -ChildPath 'pages'
+    $logoPath = Join-Path -Path $appPath -ChildPath 'assets'
+    $logoPath = Join-Path -Path $logoPath -ChildPath 'synedgy-logo.svg'
+    $logoData = [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($logoPath))
+    $logoUrl = 'data:image/svg+xml;base64,{0}' -f $logoData
+    $themePath = Join-Path -Path $appPath -ChildPath 'theme.psd1'
+    $theme = Import-PowerShellDataFile -Path $themePath
 
-    $pageList = Get-ChildItem -Path $appPagesPath -Recurse -Filter '*.ps1' | ForEach-Object {
-        $pageScript = $_.FullName
-        . $pageScript
-    }
+    $pageList = Get-ChildItem -Path $appPagesPath -Recurse -Filter '*.ps1' |
+        Sort-Object -Property Name |
+        ForEach-Object {
+            $pageScript = $_.FullName
+            . $pageScript
+        }
 
     if ($PSCmdlet.ShouldProcess('PSUConfig demo dashboard definition', 'Create dashboard application object'))
     {
-        New-UDApp -Title 'PSUConfig Demo' -Pages $pageList -Navigation (
-            New-UDList -Children {
-                New-UDListItem -Label 'Home' -Href '/' -Icon (New-UDIcon -Icon 'House')
-            }
-        ) -NavigationLayout Permanent
+        $appParameters = @{
+            Title                 = 'PSUConfig by SynEdgy'
+            Pages                 = $pageList
+            Theme                 = $theme
+            DefaultTheme          = 'Dark'
+            DisableThemeToggle    = $false
+            Logo                  = $logoUrl
+            HeaderPosition        = 'sticky'
+            Navigation            = @(
+                New-UDList -Children {
+                    $homeParameters = @{
+                        Label = 'Module-first demo'
+                        Href  = '/'
+                        Icon  = New-UDIcon -Icon 'Cubes'
+                    }
+                    New-UDListItem @homeParameters
+                }
+            )
+            NavigationLayout      = 'Permanent'
+        }
+
+        New-UDApp @appParameters
     }
 }
