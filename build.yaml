@@ -2,6 +2,7 @@
 WorkspaceModules:
   - synedgy.universal.helper
   - synedgy.PSSqlite
+  - Sampler.PowerShellUniversalTasks
 
 ####################################################
 #          ModuleBuilder Configuration             #
@@ -48,9 +49,8 @@ VersionedOutputDirectory: true
 UniversalServer:
   # UniversalServerUrl: http://localhost:5000
   # UniversalServerAppToken: changeme
-  # UniversalPSResourceRepositoryName: psuconfig-output
-  # UniversalPSResourceRepositoryUrl: ./output/
-  # UniversalPSResourceRepositoryAutoRemove: true
+  UniversalDeploymentNotificationFilter: PSUConfig
+
 
 ####################################################
 #       Sampler Pipeline Configuration             #
@@ -78,14 +78,15 @@ BuildWorkflow:
 
   pack:
     - build
-    - import_secrets
+    # - import_secrets
     - Link_Local_Workspace_Dependencies
     # - package_module_nupkg
     - package_psresource_nupkg
     # - publish_packed_module_to_universal_server
 
   deploy:
-    - publish_module_from_psresource_repos_to_universal_server
+    - build
+    - publish_psu_push_repository
 
   # Defining test task to be run when invoking `./build.ps1 -Tasks test`
   test:
@@ -173,6 +174,8 @@ ModuleBuildTasks:
   Sampler.GitHubTasks:
     - '*.ib.tasks'
   DscResource.DocGenerator:
+    - 'Task.*'
+  Sampler.PowerShellUniversalTasks:
     - 'Task.*'
   DscResource.Test:
     - 'Task.*'

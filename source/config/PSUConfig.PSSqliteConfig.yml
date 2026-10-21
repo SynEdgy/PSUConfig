@@ -1,4 +1,4 @@
-DatabasePath: $repository
+DatabasePath: '$Env:ProgramData\UniversalAutomation\Data\PSUConfig'
 databaseFile: 'PSUConfig.db'
 version: 0.0.1
 schema:

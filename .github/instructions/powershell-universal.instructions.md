@@ -1,6 +1,6 @@
 ---
 description: "PowerShell Universal authoring instructions"
-applyTo: "{source/.universal/**/*.ps1,source/PSUConfig.psd1,build.yaml,.build/PowerShellUniversal.publish.Build.ps1}"
+applyTo: "{source/.universal/**/*.ps1,source/PSUConfig.psd1,build.yaml,RequiredModules.psd1}"
 ---
 
 ## PowerShell Universal configuration and deployment
@@ -10,16 +10,13 @@ applyTo: "{source/.universal/**/*.ps1,source/PSUConfig.psd1,build.yaml,.build/Po
 - Keep the module manifest dependency contract in `source/PSUConfig.psd1`:
   - put runtime dependencies in `RequiredModules`
   - keep `PrivateData.PSData.ExternalModuleDependencies` empty unless an external gallery dependency is intentionally required.
-- Keep PSU publish orchestration in `build.yaml` workflows and `.build/PowerShellUniversal.publish.Build.ps1`; do not spread deployment logic into runtime module code.
+- Use the `Sampler.PowerShellUniversalTasks` build-task module for PSU packaging and deployment orchestration; keep workflow composition in `build.yaml` and do not spread deployment logic into runtime module code.
 - Keep `pack` focused on packaging; keep PSU deployment steps in `deploy`.
 - Always run `./build.ps1 -Tasks pack` explicitly before `./build.ps1 -Tasks deploy` (or immediately
-  before it in the same session), even though `deploy` lists `pack` as a prerequisite step.
-  Invoke-Build's incremental build detection can silently skip `pack` if it believes outputs are
-  already up to date, leaving stale or missing `output/*.nupkg` files. This causes the PSU
-  deployment call to succeed (HTTP 200) while doing nothing, or to fail server-side with errors
-  like "Unable to find repository with Name 'output'" or "Error loading module ... as root module.
-  Module not found" that only show up in the PSU admin UI / server logs, not in the build task
-  output.
+  before it in the same session) so the standard module package is also validated.
+- The `deploy` workflow builds the module, runs `publish_psu_push_repository`, and fails when PSU
+  reports a deployment error notification. It does not require or register an `output`
+  PSResourceRepository on the server.
 - Never directly modify, delete, or otherwise touch files under PSU's live Repository folder
   (e.g. `C:\ProgramData\UniversalAutomation\Repository` / its `Modules` subfolder). Only
   `./build.ps1 -Tasks deploy` should ever change files there. Manually deleting/editing files while

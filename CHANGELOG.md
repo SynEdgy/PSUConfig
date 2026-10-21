@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Moved the SQLite database outside PSU's deployed repository so full repository
+  deployments do not replace runtime data.
 - Removed bundled `NestedModule` packaging of `powershell-yaml`, `synedgy.PSSqlite`,
   and `synedgy.universal.helper` from `build.yaml`. These are now resolved solely
   as ordinary `RequiredModules` dependencies (see `source/PSUConfig.psd1`), which

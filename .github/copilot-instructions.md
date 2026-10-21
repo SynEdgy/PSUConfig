@@ -33,7 +33,7 @@ PowerShell module that ships a PowerShell Universal (PSU) instance configuration
 - Public functions in `source/Public/` are auto-exported. Private helpers in `source/Private/` are not.
 - The built module is emitted beneath `output/PSUConfig/<version>/`.
 - `build.yaml` `CopyPaths` copies runtime assets from `source/` into the built module.
-- `NestedModule` bundles declared dependencies from `output/RequiredModules/` into the built module's `Modules/` folder.
+- Runtime dependencies are declared as ordinary `RequiredModules`; local workspace dependencies are linked during builds.
 - `source/.universal/` contains PSU configuration scripts consumed after deployment, not during module import.
 - `source/.universal/endpoints.ps1` imports attributed endpoints through `Import-PSUEndpoint -Module PSUConfig`.
 - SQLite configuration lives in `source/config/PSUConfig.PSSqliteConfig.yml`.
@@ -44,6 +44,8 @@ PowerShell module that ships a PowerShell Universal (PSU) instance configuration
 - Never modify PSU's live Repository folder directly.
 - Only `./build.ps1 -Tasks deploy` may update the live repository.
 - Run `./build.ps1 -Tasks pack` explicitly before deploy; do not rely only on deploy prerequisites.
+- `deploy` uses `publish_psu_push_repository` and validates PSU deployment notifications.
+- See `.github/instructions/powershell-universal.instructions.md` for deployment details.
 
 ## Conventions
 

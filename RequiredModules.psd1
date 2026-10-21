@@ -24,6 +24,7 @@
         }
     }
     'Sampler.GitHubTasks'       = 'latest'
+    'Sampler.PowerShellUniversalTasks' = 'latest'
     MarkdownLinkCheck           = 'latest'
     'DscResource.Common'        = 'latest'
     'DscResource.Test'          = 'latest'
