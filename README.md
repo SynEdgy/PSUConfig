@@ -39,3 +39,7 @@ Set-PSUConfigSetting -Environment QA -Confirm:$false
 ```
 
 The cached configuration is shared by module commands and the PSUConfig demo.
+
+## Troubleshooting
+
+- [PSU `Invoke-PSUScript`, `-Confirm`, and `ShouldProcess`](docs/psu-invoke-psuscript-confirm-shouldprocess.md)
