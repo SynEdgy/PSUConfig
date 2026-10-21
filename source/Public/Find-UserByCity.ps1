@@ -26,12 +26,21 @@ function Find-UserByCity
     [AiTool(
         Description = 'Finds users by city'
     )]
-    param (
+    [OutputType([System.Object])]
+    param
+    (
         [Parameter(Mandatory = $true)]
-        [string]
-        $city
+        [System.String]
+        $City
     )
 
-    $users = (irm -uri https://dummyjson.com/users).users.Where({$_.address.city -like ('*{0}*' -f $city)})
-    return $users
+    $invokeRestMethodParameters = @{
+        Uri = 'https://dummyjson.com/users'
+    }
+    $cityPattern = '*{0}*' -f $City
+    $users = (Invoke-RestMethod @invokeRestMethodParameters).users.Where(
+        { $_.address.city -like $cityPattern }
+    )
+
+    $users
 }

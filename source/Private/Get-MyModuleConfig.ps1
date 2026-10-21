@@ -1,22 +1,43 @@
 function Get-myModuleConfig
 {
+    <#
+        .SYNOPSIS
+            Loads and caches the SQLite configuration used by PSUConfig.
+
+        .DESCRIPTION
+            Resolves the configured synedgy.PSSqlite YAML file, loads its database
+            configuration, and caches the result in module scope for later calls.
+
+        .PARAMETER ConfigFile
+            Specifies an alternative SQLite YAML configuration file to load instead
+            of resolving the module's default configuration file.
+
+        .PARAMETER Force
+            Forces the function to reload the configuration file and replace the
+            existing module-scoped cached configuration value.
+
+        .EXAMPLE
+            Get-myModuleConfig -Force
+
+            Reloads the default SQLite configuration and returns the refreshed value.
+    #>
     [CmdletBinding()]
+    [OutputType([synedgy.PSSqlite.SqliteDBConfig])]
     param
     (
         [Parameter(DontShow)]
-        [string]
+        [System.String]
         $ConfigFile,
 
         [Parameter()]
-        [switch]
+        [System.Management.Automation.SwitchParameter]
         $Force
     )
 
-    if  ($null -eq $script:MyModuleDBConfig -or $Force)
+    if ($null -eq $script:MyModuleDBConfig -or $Force)
     {
-        if ([string]::IsNullOrEmpty($ConfigFile))
+        if ([System.String]::IsNullOrEmpty($ConfigFile))
         {
-            # Retrieve configuration from the current's module config subdirectory
             $ConfigFile = Get-PSSqliteDBConfigFile
         }
         else
@@ -25,8 +46,7 @@ function Get-myModuleConfig
         }
 
         $script:MyModuleDBConfig = Get-PSSqliteDBConfig -ConfigFile $ConfigFile
-
     }
 
-    return $script:MyModuleDBConfig
+    $script:MyModuleDBConfig
 }
