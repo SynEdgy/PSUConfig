@@ -17,8 +17,14 @@
     Pester                      = 'latest'
     ModuleBuilder               = 'latest'
     ChangelogManagement         = 'latest'
-    Sampler                     = 'latest'
+    'sampler'  = @{
+        version = 'latest'
+        Parameters = @{
+            AllowPrerelease = $true
+        }
+    }
     'Sampler.GitHubTasks'       = 'latest'
+    'Sampler.PowerShellUniversalTasks' = 'latest'
     MarkdownLinkCheck           = 'latest'
     'DscResource.Common'        = 'latest'
     'DscResource.Test'          = 'latest'

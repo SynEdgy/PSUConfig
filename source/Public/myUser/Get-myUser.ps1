@@ -1,5 +1,48 @@
 function Get-myUser
 {
+    <#
+        .SYNOPSIS
+            Gets user records from the PSUConfig SQLite database.
+
+        .DESCRIPTION
+            Queries the myUser table with optional exact, wildcard, and date-range
+            filters and returns every database row matching the supplied criteria.
+
+        .PARAMETER id
+            Filters results by the stored numeric or textual user record identifier.
+
+        .PARAMETER firstName
+            Filters results by first name and supports PSSqlite wildcard matching.
+
+        .PARAMETER lastName
+            Filters results by last name and supports PSSqlite wildcard matching.
+
+        .PARAMETER username
+            Filters results by the stored username and supports wildcard matching.
+
+        .PARAMETER uid
+            Filters results by the external unique identifier stored for the user.
+
+        .PARAMETER email
+            Filters results by email address and supports PSSqlite wildcard matching.
+
+        .PARAMETER createdOnBefore
+            Returns records created before the supplied date and time boundary.
+
+        .PARAMETER createdOnAfter
+            Returns records created after the supplied date and time boundary.
+
+        .PARAMETER updatedOnBefore
+            Returns records updated before the supplied date and time boundary.
+
+        .PARAMETER updatedOnAfter
+            Returns records updated after the supplied date and time boundary.
+
+        .EXAMPLE
+            Get-myUser -username 'ada*'
+
+            Returns user records whose username begins with the supplied text.
+    #>
     [CmdletBinding()]
     [APIEndpoint(
         Name = 'getmyUser',
@@ -10,62 +53,66 @@ function Get-myUser
         Role = ('admin','user'),
         Timeout = 30
     )]
+    [OutputType([System.Management.Automation.PSCustomObject])]
     param
     (
         [Parameter()]
-        [string]
+        [System.String]
         $id,
 
         [Parameter()]
-        [string]
+        [System.String]
         $firstName,
 
         [Parameter()]
-        [string]
+        [System.String]
         $lastName,
 
         [Parameter()]
-        [string]
+        [System.String]
         $username,
 
         [Parameter()]
-        [string]
+        [System.String]
         $uid,
 
         [Parameter()]
-        [string]
+        [System.String]
         $email,
 
         [Parameter()]
-        [datetime]
+        [System.DateTime]
         $createdOnBefore,
 
         [Parameter()]
-        [datetime]
+        [System.DateTime]
         $createdOnAfter,
 
         [Parameter()]
-        [datetime]
+        [System.DateTime]
         $updatedOnBefore,
 
         [Parameter()]
-        [datetime]
+        [System.DateTime]
         $updatedOnAfter
     )
 
-    @([System.Management.Automation.PSCmdlet]::CommonParameters + [System.Management.Automation.PSCmdlet]::OptionalCommonParameters).ForEach{
+    @(
+        [System.Management.Automation.PSCmdlet]::CommonParameters +
+            [System.Management.Automation.PSCmdlet]::OptionalCommonParameters
+    ).ForEach{
         if ($PSBoundParameters.ContainsKey($_))
         {
             $null = $PSBoundParameters.Remove($_)
         }
     }
 
-    $getPSSqliteRowParams = @{
-        SqliteDBConfig = (Get-myModuleConfig)
-        TableName = 'myUser'
-        ClauseData = $PSBoundParameters
-        verbose = $Verbose.IsPresent -or $VerbosePreference -in @('Continue', 'Inquire')
+    $getPSSqliteRowParameters = @{
+        SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
+        TableName      = 'myUser'
+        ClauseData     = $PSBoundParameters
+        Verbose        = $Verbose.IsPresent -or $VerbosePreference -in @('Continue', 'Inquire')
     }
 
-    Get-PSSqliteRow @getPSSqliteRowParams
+    Get-PSSqliteRow @getPSSqliteRowParameters
 }

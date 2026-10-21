@@ -1,4 +1,9 @@
 ---
+WorkspaceModules:
+  - synedgy.universal.helper
+  - synedgy.PSSqlite
+  - Sampler.PowerShellUniversalTasks
+
 ####################################################
 #          ModuleBuilder Configuration             #
 ####################################################
@@ -12,6 +17,9 @@ CopyPaths:
   - .universal
   - images
   - config
+  - Apps
+  - scripts
+  - tests
 #  - DSCResources
   # - Modules
 Encoding: UTF8
@@ -30,28 +38,10 @@ VersionedOutputDirectory: true
 #      ModuleBuilder Submodules Configuration      #
 ####################################################
 
-NestedModule:
- "synedgy.universal.helper": # This is the first submodule to build into the output
-   Path: ./Output/RequiredModules/synedgy.universal.helper
-   #  is trimmed (remove metadata & Prerelease tag) and OutputDirectory expanded (the only one)
-   OutputDirectory: $BuiltModuleBase/Modules/synedgy.universal.helper
-   VersionedOutputDirectory: false
-   AddToManifest: true
-   CopyOnly: true
- "synedgy.PSSqlite": # This is the first submodule to build into the output
-   Path: ./Output/RequiredModules/synedgy.PSSqlite
-   #  is trimmed (remove metadata & Prerelease tag) and OutputDirectory expanded (the only one)
-   OutputDirectory: $BuiltModuleBase/Modules/synedgy.PSSqlite
-   VersionedOutputDirectory: false
-   AddToManifest: true
-   CopyOnly: true
- "powershell-yaml": # This is the first submodule to build into the output
-   Path: ./Output/RequiredModules/powershell-yaml
-   OutputDirectory: $BuiltModuleBase/Modules/powershell-yaml
-   VersionedOutputDirectory: false
-   AddToManifest: true
-   CopyOnly: true
-
+# NestedModule bundling has been removed: powershell-yaml, synedgy.PSSqlite,
+# and synedgy.universal.helper are now resolved as ordinary RequiredModules
+# (see source/PSUConfig.psd1), which also lets synedgy.universal.helper be
+# linked live from the workspace via WorkspaceModules during local builds.
 
 ####################################################
 #      PowerShell Universal Task Configuration     #
@@ -59,6 +49,7 @@ NestedModule:
 UniversalServer:
   # UniversalServerUrl: http://localhost:5000
   # UniversalServerAppToken: changeme
+  UniversalDeploymentNotificationFilter: PSUConfig
 
 
 ####################################################
@@ -73,6 +64,7 @@ BuildWorkflow:
   build:
     - Clean
     - Build_Module_ModuleBuilder
+    - Link_Local_Workspace_Dependencies
     - Build_NestedModules_ModuleBuilder
     - Create_changelog_release_output
 
@@ -84,13 +76,42 @@ BuildWorkflow:
       }
     }
 
+  configure_demo_psu_token: |
+    {
+      if ([string]::IsNullOrWhiteSpace($env:UniversalServerUrl) -or
+          [string]::IsNullOrWhiteSpace($env:UniversalServerAppToken))
+      {
+        throw 'UniversalServerUrl and UniversalServerAppToken are required to configure the demo application token.'
+      }
+
+      $connectionParameters = @{
+        ComputerName = $env:UniversalServerUrl
+        AppToken     = $env:UniversalServerAppToken
+      }
+      $variableParameters = @{
+        Name        = 'psuconfig_automation_bot_token'
+        Description = 'App token used by the PSUConfigDemo app to execute its demonstration script and read job output.'
+        Scope       = 'Global'
+        Vault       = 'Database'
+        Value       = $env:UniversalServerAppToken
+        Force       = $true
+      }
+
+      New-PSUVariable @variableParameters @connectionParameters | Out-Null
+    }
+
   pack:
     - build
-    - import_secrets
-    - package_module_nupkg
-    - publish_packed_module_to_universal_server
+    # - import_secrets
+    - Link_Local_Workspace_Dependencies
+    # - package_module_nupkg
+    - package_psresource_nupkg
+    # - publish_packed_module_to_universal_server
 
-
+  deploy:
+    - build
+    - publish_psu_push_repository
+    - configure_demo_psu_token
 
   # Defining test task to be run when invoking `./build.ps1 -Tasks test`
   test:
@@ -112,6 +133,11 @@ BuildWorkflow:
     - Publish_GitHub_Wiki_Content
 
     - publish_module_to_gallery
+
+  # Quality gate task, only runs when explicitly requested via `./build.ps1 -Tasks hqrmtest`.
+  # Not part of '.', build, test, pack, deploy, or publish workflows.
+  hqrmtest:
+    - Invoke_HQRM_Tests_Stop_On_Fail
 
 ####################################################
 #       PESTER  Configuration                      #
@@ -172,6 +198,12 @@ ModuleBuildTasks:
     - '*.build.Sampler.ib.tasks'
   Sampler.GitHubTasks:
     - '*.ib.tasks'
+  DscResource.DocGenerator:
+    - 'Task.*'
+  Sampler.PowerShellUniversalTasks:
+    - 'Task.*'
+  DscResource.Test:
+    - 'Task.*'
 
 
 # Invoke-Build Header to be used to 'decorate' the terminal output of the tasks.

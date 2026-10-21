@@ -1,0 +1,7 @@
+Environments:
+  DEV:
+    UniversalServerUrl: 'http://localhost:5000'
+  QA:
+    UniversalServerUrl: 'https://psuconfig-qa.synedgy.com/'
+  PROD:
+    UniversalServerUrl: 'https://psuconfig.synedgy.com/'
