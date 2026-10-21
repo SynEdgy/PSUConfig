@@ -56,6 +56,13 @@ function New-PSUConfigDemoConsole
                         Icon  = New-UDIcon -Icon 'Cubes'
                     }
                     New-UDListItem @homeParameters
+
+                    $usersParameters = @{
+                        Label = 'Users'
+                        Href  = '/users'
+                        Icon  = New-UDIcon -Icon 'Users'
+                    }
+                    New-UDListItem @usersParameters
                 }
             )
             NavigationLayout      = 'Permanent'

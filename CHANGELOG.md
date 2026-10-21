@@ -47,3 +47,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   below their titles at every responsive grid size.
 - Added `Get-PSUConfigDatabaseAnalysis` and a dashboard action that runs it as a
   PSU job to report live table record counts and the stored SQLite schema version.
+- Added a permanent Users navigation page backed by the reusable
+  `New-PSUConfigUserTable` dashboard component and `Get-PSUConfigUser`.
+- Added a floating add-user action and reusable `New-PSUConfigUserForm` modal
+  that creates records through `New-PSUConfigUser` and refreshes the Users table.
+- Added Edit and Remove columns to the PSUConfig Users table. Edit opens the
+  shared user form with existing values and saves through `Set-PSUConfigUser`;
+  Remove requires explicit modal confirmation before calling
+  `Remove-PSUConfigUser`.
+
+### Fixed
+
+- Enabled free-text search across the PSUConfig Users table data columns by
+  explicitly including them in Universal Dashboard search.

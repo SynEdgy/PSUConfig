@@ -18,6 +18,13 @@ components rather than embedded theme CSS. Job pages use the shared
 - `Home` (`/psuconfig-demo`): presents the module-first/Sampler deployment model,
   active environment and schema details, and triggers
   `Get-PSUConfigDatabaseAnalysis` as a PSU job.
+- `Users` (`/psuconfig-demo/users`): displays `Get-PSUConfigUser` results through
+  the reusable `New-PSUConfigUserTable` dashboard component. A floating action
+  opens the reusable `New-PSUConfigUserForm` in a modal and refreshes the table
+  after `New-PSUConfigUser` creates the record. Each row provides an Edit action
+  that opens the same form with existing values and saves through
+  `Set-PSUConfigUser`, plus a Remove action with explicit modal confirmation
+  before `Remove-PSUConfigUser` deletes the row.
 - `Job Info` (`/psuconfig-demo/job/:id`): renders the job header and terminal
   output view for the given job id.
 
