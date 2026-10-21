@@ -55,7 +55,7 @@ function Get-PSUConfigSetting
         $Force
     )
 
-    if ($null -eq $script:MyModuleConfig -or $Force.IsPresent)
+    if ($null -eq $script:PSUConfigSetting -or $Force.IsPresent)
     {
         $config = [ordered]@{}
         $dbConfigFile = Join-Path -Path $ConfigFolder -ChildPath $DBConfigFileName
@@ -92,8 +92,8 @@ function Get-PSUConfigSetting
         }
 
         $config.CurrentEnvironment = $Environment
-        $script:MyModuleConfig = $config
+        $script:PSUConfigSetting = $config
     }
 
-    $script:MyModuleConfig
+    $script:PSUConfigSetting
 }

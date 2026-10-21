@@ -1,3 +1,3 @@
-$script:MyModuleDBConfig = $null
-$script:MyModuleConfig = $null
-$script:Environment = $null
+$script:PSUConfigDatabaseConfiguration = $null
+$script:PSUConfigSetting = $null
+$script:PSUConfigEnvironment = $null

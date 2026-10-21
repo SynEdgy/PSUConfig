@@ -43,7 +43,7 @@ Environments:
 
     BeforeEach {
         InModuleScope $script:moduleName {
-            $script:MyModuleConfig = $null
+            $script:PSUConfigSetting = $null
         }
     }
 

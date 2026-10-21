@@ -42,7 +42,7 @@ Describe 'Get-PSUConfigDatabaseConfiguration' {
 
     BeforeEach {
         InModuleScope $script:moduleName {
-            $script:MyModuleDBConfig = $null
+            $script:PSUConfigDatabaseConfiguration = $null
         }
     }
 

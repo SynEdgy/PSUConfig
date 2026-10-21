@@ -34,33 +34,33 @@ function Get-CurrentEnvironment
         $Force
     )
 
-    if (-not [string]::IsNullOrWhiteSpace($script:Environment) -and -not $Force.IsPresent)
+    if (-not [string]::IsNullOrWhiteSpace($script:PSUConfigEnvironment) -and -not $Force.IsPresent)
     {
-        return $script:Environment
+        return $script:PSUConfigEnvironment
     }
 
     if ($PSBoundParameters.ContainsKey('Environment'))
     {
-        $script:Environment = $Environment
+        $script:PSUConfigEnvironment = $Environment
     }
     elseif (-not [string]::IsNullOrWhiteSpace($env:ServerEnvironment) -and
         $env:ServerEnvironment -in @('DEV', 'QA', 'PROD'))
     {
-        $script:Environment = $env:ServerEnvironment
+        $script:PSUConfigEnvironment = $env:ServerEnvironment
     }
     elseif ($env:COMPUTERNAME -match '-QA$')
     {
-        $script:Environment = 'QA'
+        $script:PSUConfigEnvironment = 'QA'
     }
     elseif ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and
         (Get-CimInstance -ClassName Win32_OperatingSystem).ProductType -eq 1)
     {
-        $script:Environment = 'DEV'
+        $script:PSUConfigEnvironment = 'DEV'
     }
     else
     {
-        $script:Environment = 'PROD'
+        $script:PSUConfigEnvironment = 'PROD'
     }
 
-    $script:Environment
+    $script:PSUConfigEnvironment
 }
