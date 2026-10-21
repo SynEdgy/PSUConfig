@@ -26,7 +26,7 @@ function Remove-myUser
     )
 
     $removePSSqliteRowParameters = @{
-        SqliteDBConfig = (Get-myModuleConfig)
+        SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
         TableName      = 'myUser'
         ClauseData     = @{
             id = $id

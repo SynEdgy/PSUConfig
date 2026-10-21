@@ -1,4 +1,4 @@
-function Get-myModuleConfig
+function Get-PSUConfigDatabaseConfiguration
 {
     <#
         .SYNOPSIS
@@ -17,7 +17,7 @@ function Get-myModuleConfig
             existing module-scoped cached configuration value.
 
         .EXAMPLE
-            Get-myModuleConfig -Force
+            Get-PSUConfigDatabaseConfiguration -Force
 
             Reloads the default SQLite configuration and returns the refreshed value.
     #>
@@ -34,19 +34,15 @@ function Get-myModuleConfig
         $Force
     )
 
-    if ($null -eq $script:MyModuleDBConfig -or $Force)
+    if (-not [string]::IsNullOrWhiteSpace($ConfigFile))
     {
-        if ([System.String]::IsNullOrEmpty($ConfigFile))
-        {
-            $ConfigFile = Get-PSSqliteDBConfigFile
-        }
-        else
-        {
-            Write-Verbose -Message ('Loading configuration from {0}' -f $ConfigFile)
-        }
-
+        Write-Verbose -Message ('Loading SQLite configuration from {0}' -f $ConfigFile)
         $script:MyModuleDBConfig = Get-PSSqliteDBConfig -ConfigFile $ConfigFile
+        return $script:MyModuleDBConfig
     }
+
+    $moduleConfig = Get-PSUConfigSetting -Force:$Force.IsPresent
+    $script:MyModuleDBConfig = $moduleConfig.SqliteDBConfig
 
     $script:MyModuleDBConfig
 }

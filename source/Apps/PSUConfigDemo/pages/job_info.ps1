@@ -5,10 +5,13 @@ New-UDPage -Name 'Job Info' -Url '/job/:id' -Content {
     # authorization entirely and would allow reading any job in the instance. -Integrated
     # is only used as a fallback when no token is configured (e.g. quick local setup).
     $appToken = [string]$secret:psuconfig_automation_bot_token
+    $moduleConfig = Get-PSUConfigSetting
+    $serverUrl = [string]$moduleConfig.UniversalServerUrl
     $getJobParams = @{ Id = $jobId }
     if (-not [string]::IsNullOrWhiteSpace($appToken))
     {
         $getJobParams['AppToken'] = $appToken
+        $getJobParams['ComputerName'] = $serverUrl
     }
     else
     {
@@ -28,6 +31,7 @@ New-UDPage -Name 'Job Info' -Url '/job/:id' -Content {
     if (-not [string]::IsNullOrWhiteSpace($appToken))
     {
         $terminalViewParams['AppToken'] = $appToken
+        $terminalViewParams['UniversalServerUrl'] = $serverUrl
     }
 
     New-UDPsuJobTerminalView @terminalViewParams

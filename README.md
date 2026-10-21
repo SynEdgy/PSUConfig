@@ -25,3 +25,17 @@ to build and publish your module to PowerShell Universal.
 ```powershell
 . .\secrets.local.ps1 
 .\build.ps1 -Tasks build,pack,deploy
+```
+
+## Environment configuration
+
+Runtime URLs are defined in `source/config/PSUConfig.config.yml` for the `DEV`,
+`QA`, and `PROD` environments. `Get-CurrentEnvironment` selects the environment
+from an explicit parameter, `$Env:ServerEnvironment`, or machine defaults.
+`Get-PSUConfigSetting` returns the merged settings for the active environment.
+
+```powershell
+Set-PSUConfigSetting -Environment QA -Confirm:$false
+```
+
+The cached configuration is shared by module commands and the PSUConfig demo.

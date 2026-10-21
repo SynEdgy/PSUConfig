@@ -66,7 +66,7 @@ function Set-myUser
 
     $null = $PSBoundParameters.Remove('id')
     $updatePSSqliteRowParameters = @{
-        SqliteDBConfig = (Get-myModuleConfig)
+        SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
         TableName      = 'myUser'
         RowData        = $PSBoundParameters
         ClauseData     = @{

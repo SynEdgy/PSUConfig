@@ -70,7 +70,7 @@ function New-myUser
 
     $PSBoundParameters['createdOn'] = Get-Date
     $insertPSSqliteRowParameters = @{
-        SqliteDBConfig = (Get-myModuleConfig)
+        SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
         TableName      = 'myUser'
         RowData        = $PSBoundParameters
         Verbose        = $Verbose.IsPresent -or $VerbosePreference -in @('Continue', 'Inquire')

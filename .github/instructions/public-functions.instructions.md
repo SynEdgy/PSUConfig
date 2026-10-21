@@ -30,9 +30,9 @@ Public functions are auto-exported and form the module API and, when attributed,
   ```powershell
   [Parameter(DontShow)]
   [synedgy.PSSqlite.SqliteDBConfig]
-  $SqliteDBConfig = (Get-myModuleConfig)
+  $SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
   ```
-- Do not reload YAML inside a function; use the cached `Get-myModuleConfig` result.
+- Do not reload YAML inside a function; use the cached `Get-PSUConfigDatabaseConfiguration` result.
 
 ## PSU endpoint exposure
 

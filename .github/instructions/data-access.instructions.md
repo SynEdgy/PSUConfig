@@ -17,7 +17,7 @@ Use the `synedgy.PSSqlite` CRUD helpers; do not hand-write SQL or open `Microsof
 
 ## Parameter conventions
 
-- Pass the cached `[synedgy.PSSqlite.SqliteDBConfig]` from `Get-myModuleConfig` to the `-SqliteDBConfig` parameter. Do not reload the YAML inside functions.
+- Pass the cached `[synedgy.PSSqlite.SqliteDBConfig]` from `Get-PSUConfigDatabaseConfiguration` to the `-SqliteDBConfig` parameter. Do not reload the YAML inside functions.
 - Pass `-TableName` as a literal string matching `schema.Tables.<Name>` in the YAML.
 - `-RowData` and `-ClauseData` accept `[System.Collections.IDictionary]`. Keys must match column names declared in the schema; unknown keys emit `Write-Warning` and are silently dropped.
 - `$null` values in `-RowData` are dropped (use `Invoke-PSSqliteQuery` with `DBNULL` if a NULL write is required).

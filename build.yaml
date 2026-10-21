@@ -76,6 +76,30 @@ BuildWorkflow:
       }
     }
 
+  configure_demo_psu_token: |
+    {
+      if ([string]::IsNullOrWhiteSpace($env:UniversalServerUrl) -or
+          [string]::IsNullOrWhiteSpace($env:UniversalServerAppToken))
+      {
+        throw 'UniversalServerUrl and UniversalServerAppToken are required to configure the demo application token.'
+      }
+
+      $connectionParameters = @{
+        ComputerName = $env:UniversalServerUrl
+        AppToken     = $env:UniversalServerAppToken
+      }
+      $variableParameters = @{
+        Name        = 'psuconfig_automation_bot_token'
+        Description = 'App token used by the PSUConfigDemo app to execute its demonstration script and read job output.'
+        Scope       = 'Global'
+        Vault       = 'Database'
+        Value       = $env:UniversalServerAppToken
+        Force       = $true
+      }
+
+      New-PSUVariable @variableParameters @connectionParameters | Out-Null
+    }
+
   pack:
     - build
     # - import_secrets
@@ -87,6 +111,7 @@ BuildWorkflow:
   deploy:
     - build
     - publish_psu_push_repository
+    - configure_demo_psu_token
 
   # Defining test task to be run when invoking `./build.ps1 -Tasks test`
   test:

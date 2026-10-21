@@ -27,10 +27,13 @@ AfterAll {
     Remove-Module -Name $script:moduleName
 }
 
-Describe 'Get-myModuleConfig' {
+Describe 'Get-PSUConfigDatabaseConfiguration' {
     BeforeAll {
-        Mock -CommandName Get-PSSqliteDBConfigFile -MockWith {
-            'PSUConfig.PSSqliteConfig.yml'
+        $script:databaseConfig = [synedgy.PSSqlite.SqliteDBConfig]::new($TestDrive, 'PSUConfig.db')
+        Mock -CommandName Get-PSUConfigSetting -MockWith {
+            @{
+                SqliteDBConfig = $script:databaseConfig
+            }
         }
         Mock -CommandName Get-PSSqliteDBConfig -MockWith {
             [synedgy.PSSqlite.SqliteDBConfig]::new($TestDrive, 'PSUConfig.db')
@@ -43,20 +46,16 @@ Describe 'Get-myModuleConfig' {
         }
     }
 
-    It 'Should resolve and cache the default database configuration' {
-        $result = InModuleScope $script:moduleName {
-            Get-myModuleConfig
-            Get-myModuleConfig
-        }
+    It 'Should return the database configuration from the merged module configuration' {
+        $result = InModuleScope $script:moduleName { Get-PSUConfigDatabaseConfiguration }
 
-        @($result).Count | Should -Be 2
-        Should -Invoke -CommandName Get-PSSqliteDBConfigFile -Exactly -Times 1 -Scope It
-        Should -Invoke -CommandName Get-PSSqliteDBConfig -Exactly -Times 1 -Scope It
+        $result | Should -Be $script:databaseConfig
+        Should -Invoke -CommandName Get-PSUConfigSetting -Exactly -Times 1 -Scope It
     }
 
     It 'Should reload an explicitly supplied configuration when forced' {
         InModuleScope $script:moduleName {
-            Get-myModuleConfig -ConfigFile 'custom.yml' -Force
+            Get-PSUConfigDatabaseConfiguration -ConfigFile 'custom.yml' -Force
         }
 
         Should -Invoke -CommandName Get-PSSqliteDBConfig -Exactly -Times 1 -Scope It -ParameterFilter {

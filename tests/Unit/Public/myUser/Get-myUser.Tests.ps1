@@ -30,7 +30,7 @@ AfterAll {
 Describe 'Get-myUser' {
     BeforeAll {
         $script:databaseConfig = [synedgy.PSSqlite.SqliteDBConfig]::new($TestDrive, 'PSUConfig.db')
-        Mock -CommandName Get-myModuleConfig -MockWith { $script:databaseConfig }
+        Mock -CommandName Get-PSUConfigDatabaseConfiguration -MockWith { $script:databaseConfig }
         Mock -CommandName Get-PSSqliteRow -MockWith {
             [pscustomobject]@{ username = 'ada' }
         }

@@ -25,7 +25,7 @@ function Initialize-PSUConfigDB
     (
         [Parameter(DontShow)]
         [synedgy.PSSqlite.SqliteDBConfig]
-        $SqliteDBConfig = (Get-myModuleConfig),
+        $SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration),
 
         [Parameter()]
         [System.Management.Automation.SwitchParameter]

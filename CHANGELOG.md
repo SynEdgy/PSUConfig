@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `source/.universal/mcpTools.ps1` (which called the non-existent `New-PsuMcpTool`
   cmdlet) with a single `Import-PSUAiTool -Module PSUConfig -Environment "PSUConfig"`
   call, mirroring the existing `[APIEndpoint()]` / `Import-PSUEndpoint` pattern.
+- Added environment-aware module configuration with DEV, QA, and PROD PowerShell
+  Universal URLs, following the ComsolCentral cached YAML configuration pattern.
 - Initial changelog created.
 
 ### Changed
@@ -32,3 +34,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as ordinary `RequiredModules` dependencies (see `source/PSUConfig.psd1`), which
   also allows `synedgy.universal.helper` to be linked live from the workspace via
   `WorkspaceModules` during local builds.
+- Updated the PSUConfig demo to resolve its management API URL from the active
+  environment configuration, including live job-output refreshes.

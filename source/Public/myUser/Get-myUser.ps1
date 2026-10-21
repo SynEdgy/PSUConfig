@@ -108,7 +108,7 @@ function Get-myUser
     }
 
     $getPSSqliteRowParameters = @{
-        SqliteDBConfig = (Get-myModuleConfig)
+        SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
         TableName      = 'myUser'
         ClauseData     = $PSBoundParameters
         Verbose        = $Verbose.IsPresent -or $VerbosePreference -in @('Continue', 'Inquire')

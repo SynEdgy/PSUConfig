@@ -37,7 +37,7 @@ PowerShell module that ships a PowerShell Universal (PSU) instance configuration
 - `source/.universal/` contains PSU configuration scripts consumed after deployment, not during module import.
 - `source/.universal/endpoints.ps1` imports attributed endpoints through `Import-PSUEndpoint -Module PSUConfig`.
 - SQLite configuration lives in `source/config/PSUConfig.PSSqliteConfig.yml`.
-- `Get-myModuleConfig` loads and caches the SQLite config; `Initialize-PSUConfigDB` applies it.
+- `Get-PSUConfigDatabaseConfiguration` loads and caches the SQLite config; `Initialize-PSUConfigDB` applies it.
 
 ## Deployment safety
 

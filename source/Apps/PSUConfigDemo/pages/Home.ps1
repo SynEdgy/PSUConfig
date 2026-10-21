@@ -10,11 +10,13 @@ New-UDPage -Name 'Home' -Url '/' -Content {
         # authorization entirely. -Integrated is only used as a fallback when no token is
         # configured (e.g. quick local setup).
         $appToken = [string]$secret:psuconfig_automation_bot_token
+        $moduleConfig = Get-PSUConfigSetting
+        $serverUrl = [string]$moduleConfig.UniversalServerUrl
         $commonParams = @{}
         if (-not [string]::IsNullOrWhiteSpace($appToken))
         {
             $commonParams['AppToken'] = $appToken
-            $commonParams['ComputerName'] = 'http://localhost:5000'
+            $commonParams['ComputerName'] = $serverUrl
         }
         else
         {
