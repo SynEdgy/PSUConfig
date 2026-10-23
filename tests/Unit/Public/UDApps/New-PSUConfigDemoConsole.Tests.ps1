@@ -115,9 +115,12 @@ Describe 'New-PSUConfigDemoConsole' {
         $homeSource | Should -Match '\$psuConfigDemoStrings\.DeliverySectionTitle'
         $homeSource | Should -Match '\$psuConfigDemoStrings\.SurfacesSectionTitle'
         $homeSource | Should -Match '\$psuConfigDemoStrings\.TargetSectionTitle'
-        $homeSource | Should -Not -Match "'From repository to running platform'"
-        $homeSource | Should -Not -Match "'One module, every PSU surface'"
-        $homeSource | Should -Not -Match "'Active target'"
+        $homeSource | Should -Match "# 'From repository to running platform'"
+        $homeSource | Should -Not -Match "New-UDTypography\s+-Text\s+'From repository to running platform'"
+        $homeSource | Should -Match "# 'One module, every PSU surface'"
+        $homeSource | Should -Not -Match "New-UDTypography\s+-Text\s+'One module, every PSU surface'"
+        $homeSource | Should -Match "# 'Active target'"
+        $homeSource | Should -Not -Match "New-UDTypography\s+-Text\s+'Active target'"
         $homeSource | Should -Not -Match '\$tl:'
         $usersSource | Should -Match "Name\s*=\s*'PSUConfig\.Users'"
         $usersSource | Should -Match 'Get-PSUConfigLocalizedData'
@@ -129,7 +132,8 @@ Describe 'New-PSUConfigDemoConsole' {
         $jobInfoSource | Should -Match '\$psuConfigDemoStrings\.JobPageTitle'
         $jobInfoSource | Should -Match '\$psuConfigDemoStrings\.JobPageDescription'
         $jobInfoSource | Should -Match '\$psuConfigDemoStrings\.JobBackButton'
-        $jobInfoSource | Should -Not -Match "'Back to module-first demo'"
+        $jobInfoSource | Should -Match "# 'Back to module-first demo'"
+        $jobInfoSource | Should -Not -Match "Text\s*=\s*'Back to module-first demo'"
         $jobInfoSource | Should -Match 'New-UDPsuJobHeader @headerParameters'
         $jobInfoSource | Should -Match 'Language\s+= \$language'
         $jobInfoSource | Should -Match 'DefaultUILanguage\s+= \$defaultUILanguage'
