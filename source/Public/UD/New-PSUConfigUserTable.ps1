@@ -23,10 +23,15 @@ function New-PSUConfigUserTable
         .PARAMETER SyncElementId
             Specifies the dashboard element refreshed after editing or removing a user.
 
-        .EXAMPLE
-            New-PSUConfigUserTable -Id 'psuConfigUsers' -PageSize 20
+        .PARAMETER Language
+            Specifies the requested language for the component-owned
+            PSUConfig.UserTable localization resource.
 
-            Renders a searchable PSUConfig user table showing twenty records per page.
+        .EXAMPLE
+            New-PSUConfigUserTable -Id 'psuConfigUsers' -PageSize 20 -Language 'fr'
+
+            Renders a localized searchable PSUConfig user table showing twenty
+            records per page.
     #>
     [CmdletBinding(
         SupportsShouldProcess = $true,
@@ -40,8 +45,9 @@ function New-PSUConfigUserTable
         $Id = 'psuConfigUserTable',
 
         [Parameter()]
+        [ValidateNotNullOrEmpty()]
         [System.String]
-        $Title = 'Internal users',
+        $Title,
 
         [Parameter()]
         [ValidateRange(1, 100)]
@@ -50,8 +56,25 @@ function New-PSUConfigUserTable
 
         [Parameter()]
         [System.String]
-        $SyncElementId = 'psuConfigUsersRegion'
+        $SyncElementId = 'psuConfigUsersRegion',
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Language
     )
+
+    $psuConfigUserTableStringsParameters = @{
+        Name              = 'PSUConfig.UserTable'
+        Language          = $Language
+        DefaultUILanguage = (Get-PSUConfigSetting).DefaultUILanguage
+        Cache             = $Cache:PSUConfigLocalization
+    }
+    $psuConfigUserTableStrings = Get-PSUComponentLocalizedData @psuConfigUserTableStringsParameters
+    $Page:PSUConfigUserTableStrings = $psuConfigUserTableStrings
+    $Page:PSUConfigUserTableLanguage = $Language
+    # 'Internal users'
+    $resolvedTitle = if ($PSBoundParameters.ContainsKey('Title')) { $Title } else { $psuConfigUserTableStrings.TableTitle }
 
     if ($PSCmdlet.ShouldProcess($Id, 'Render PSUConfig user table'))
     {
@@ -67,24 +90,35 @@ function New-PSUConfigUserTable
                     }
             )
             $columns = @(
-                New-UDTableColumn -Property id -Title 'ID' -Width 70 -IncludeInSearch
-                New-UDTableColumn -Property firstName -Title 'First name' -IncludeInSearch
-                New-UDTableColumn -Property lastName -Title 'Last name' -IncludeInSearch
-                New-UDTableColumn -Property username -Title 'Username' -IncludeInSearch
-                New-UDTableColumn -Property uid -Title 'UID' -IncludeInSearch
-                New-UDTableColumn -Property email -Title 'Email' -IncludeInSearch
-                New-UDTableColumn -Property createdOn -Title 'Created' -IncludeInSearch
-                New-UDTableColumn -Property updatedOn -Title 'Updated' -IncludeInSearch
-                New-UDTableColumn -Property edit -Title 'Edit' -Render {
+                # 'ID'
+                New-UDTableColumn -Property id -Title $psuConfigUserTableStrings.IdColumn -Width 70 -IncludeInSearch
+                # 'First name'
+                New-UDTableColumn -Property firstName -Title $psuConfigUserTableStrings.FirstNameColumn -IncludeInSearch
+                # 'Last name'
+                New-UDTableColumn -Property lastName -Title $psuConfigUserTableStrings.LastNameColumn -IncludeInSearch
+                # 'Username'
+                New-UDTableColumn -Property username -Title $psuConfigUserTableStrings.UsernameColumn -IncludeInSearch
+                # 'UID'
+                New-UDTableColumn -Property uid -Title $psuConfigUserTableStrings.UidColumn -IncludeInSearch
+                # 'Email'
+                New-UDTableColumn -Property email -Title $psuConfigUserTableStrings.EmailColumn -IncludeInSearch
+                # 'Created'
+                New-UDTableColumn -Property createdOn -Title $psuConfigUserTableStrings.CreatedColumn -IncludeInSearch
+                # 'Updated'
+                New-UDTableColumn -Property updatedOn -Title $psuConfigUserTableStrings.UpdatedColumn -IncludeInSearch
+                # 'Edit'
+                New-UDTableColumn -Property edit -Title $psuConfigUserTableStrings.EditColumn -Render {
                     $editButtonParameters = @{
                         Id      = 'editPSUConfigUser-{0}' -f $EventData.id
-                        Text    = 'Edit'
+                        # 'Edit'
+                        Text    = $Page:PSUConfigUserTableStrings.EditButton
                         Variant = 'outlined'
                         Color   = 'primary'
                         Icon    = New-UDIcon -Icon Pen
                         OnClick = {
                             Show-UDModal -Content {
-                                New-UDCard -Title 'Edit PSUConfig user' -Content {
+                                # 'Edit PSUConfig user'
+                                New-UDCard -Title $Page:PSUConfigUserTableStrings.EditModalTitle -Content {
                                     $formParameters = @{
                                         FormId        = 'editPSUConfigUserForm'
                                         SyncElementId = [System.String]$EventData._syncElementId
@@ -93,13 +127,15 @@ function New-PSUConfigUserTable
                                         LastName      = [System.String]$EventData.lastName
                                         Username      = [System.String]$EventData.username
                                         Email         = [System.String]$EventData.email
+                                        Language      = $Page:PSUConfigUserTableLanguage
                                         Confirm       = $false
                                     }
 
                                     New-PSUConfigUserForm @formParameters
                                 }
                             } -Footer {
-                                New-UDButton -Text 'Cancel' -OnClick {
+                                # 'Cancel'
+                                New-UDButton -Text $Page:PSUConfigUserTableStrings.Cancel -OnClick {
                                     Hide-UDModal
                                 }
                             }
@@ -108,23 +144,29 @@ function New-PSUConfigUserTable
 
                     New-UDButton @editButtonParameters
                 }
-                New-UDTableColumn -Property remove -Title 'Remove' -Render {
+                # 'Remove'
+                New-UDTableColumn -Property remove -Title $psuConfigUserTableStrings.RemoveColumn -Render {
                     $removeButtonParameters = @{
                         Id      = 'removePSUConfigUser-{0}' -f $EventData.id
-                        Text    = 'Remove'
+                        # 'Remove'
+                        Text    = $Page:PSUConfigUserTableStrings.RemoveButton
                         Variant = 'outlined'
                         Color   = 'error'
                         Icon    = New-UDIcon -Icon Trash
                         OnClick = {
                             Show-UDModal -Content {
-                                New-UDTypography -Text ('Remove user {0} ({1})?' -f $EventData.username, $EventData.id) -Variant h6
-                                New-UDTypography -Text 'This permanently deletes the selected database row.' -Variant body1
+                                # 'Remove user {0} ({1})?'
+                                New-UDTypography -Text ($Page:PSUConfigUserTableStrings.RemovePrompt -f $EventData.username, $EventData.id) -Variant h6
+                                # 'This permanently deletes the selected database row.'
+                                New-UDTypography -Text $Page:PSUConfigUserTableStrings.RemoveWarning -Variant body1
                             } -Footer {
-                                New-UDButton -Text 'Cancel' -OnClick {
+                                # 'Cancel'
+                                New-UDButton -Text $Page:PSUConfigUserTableStrings.Cancel -OnClick {
                                     Hide-UDModal
                                 }
 
-                                New-UDButton -Text 'Remove user' -Color error -OnClick {
+                                # 'Remove user'
+                                New-UDButton -Text $Page:PSUConfigUserTableStrings.RemoveConfirm -Color error -OnClick {
                                     try
                                     {
                                         $userId = [System.Int64]$EventData.id
@@ -135,7 +177,8 @@ function New-PSUConfigUserTable
                                         $toastParameters = @{
                                             BackgroundColor = 'Green'
                                             MessageColor    = 'White'
-                                            Message         = 'User {0} removed.' -f $username
+                                            # 'User {0} removed.'
+                                            Message         = $Page:PSUConfigUserTableStrings.UserRemovedMessage -f $username
                                             Duration        = 3000
                                             Position        = 'TopCenter'
                                         }
@@ -165,7 +208,7 @@ function New-PSUConfigUserTable
             )
             $tableParameters = @{
                 Id             = $Id
-                Title          = $Title
+                Title          = $resolvedTitle
                 Data           = $users
                 Columns        = $columns
                 Dense          = $true

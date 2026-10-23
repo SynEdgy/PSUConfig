@@ -3,6 +3,30 @@ New-UDPage -Name 'Job execution' -Url '/job/:id' -Content {
     $appToken = [string]$secret:psuconfig_automation_bot_token
     $moduleConfig = Get-PSUConfigSetting
     $serverUrl = [string]$moduleConfig.UniversalServerUrl
+    $defaultUILanguage = $moduleConfig.DefaultUILanguage
+    if ($null -eq $defaultUILanguage)
+    {
+        $defaultUILanguage = 'en'
+    }
+
+    $languageParameters = @{
+        ModuleBase        = (Get-PSUConfigModule).ModuleBase
+        Name              = 'PSUConfigDemo'
+        PreferredLanguage = [System.String] $Cookies['PSUConfigLanguage']
+        AcceptLanguage    = [System.String] $Headers['Accept-Language']
+        DefaultUILanguage = $defaultUILanguage
+    }
+    $language = Resolve-PSULocalizationLanguage @languageParameters
+    if ($null -eq $Cache:PSUConfigLocalization)
+    {
+        $Cache:PSUConfigLocalization = [System.Collections.Hashtable]::Synchronized(@{})
+    }
+
+    $psuConfigDemoStringsParameters = @{
+        Language = $language
+        Cache    = $Cache:PSUConfigLocalization
+    }
+    $psuConfigDemoStrings = Get-PSUConfigLocalizedData @psuConfigDemoStringsParameters
 
     $getJobParameters = @{
         Id = $jobId
@@ -20,7 +44,8 @@ New-UDPage -Name 'Job execution' -Url '/job/:id' -Content {
     $job = Get-PSUJob @getJobParameters
     if ($null -eq $job)
     {
-        throw "PowerShell Universal job '$jobId' was not found."
+        # "PowerShell Universal job '$jobId' was not found."
+        throw ($psuConfigDemoStrings.JobNotFound -f $jobId)
     }
 
     New-UDElement -Tag 'main' -Attributes @{
@@ -36,17 +61,20 @@ New-UDPage -Name 'Job execution' -Url '/job/:id' -Content {
                 margin   = '0 auto'
             }
         } -Content {
-            New-UDTypography -Text 'SYNEDGY · MODULE-FIRST JOB EXECUTION' -Variant overline -Style @{
+            # 'SYNEDGY · MODULE-FIRST JOB EXECUTION'
+            New-UDTypography -Text $psuConfigDemoStrings.JobPageEyebrow -Variant overline -Style @{
                 color         = '#38A7DF'
                 fontWeight    = 800
                 letterSpacing = '0.14em'
             }
-            New-UDTypography -Text ("PowerShell Universal job #{0}" -f $jobId) -Variant h3 -Style @{
+            # 'PowerShell Universal job #{0}'
+            New-UDTypography -Text ($psuConfigDemoStrings.JobPageTitle -f $jobId) -Variant h3 -Style @{
                 fontWeight    = 850
                 letterSpacing = '-0.035em'
                 marginBottom  = '8px'
             }
-            New-UDTypography -Text 'A module-backed command executed by PSU with live, authenticated output retrieval.' -Sx @{
+            # 'A module-backed command executed by PSU with live, authenticated output retrieval.'
+            New-UDTypography -Text $psuConfigDemoStrings.JobPageDescription -Sx @{
                 color = 'text.secondary'
             } -Style @{
                 marginBottom = '24px'
@@ -61,7 +89,12 @@ New-UDPage -Name 'Job execution' -Url '/job/:id' -Content {
                 flexDirection = 'column'
                 gap          = '12px'
             } -Children {
-                New-UDPsuJobHeader -Job $job
+                $headerParameters = @{
+                    Job               = $job
+                    Language          = $language
+                    DefaultUILanguage = $defaultUILanguage
+                }
+                New-UDPsuJobHeader @headerParameters
 
                 $terminalParameters = @{
                     JobId                  = $jobId
@@ -69,6 +102,8 @@ New-UDPage -Name 'Job execution' -Url '/job/:id' -Content {
                     JobOutputSnapshot      = @($job.Output)
                     IncludeStructuredTable = $true
                     AutoRefreshInterval    = 2
+                    Language               = $language
+                    DefaultUILanguage      = $defaultUILanguage
                 }
                 if (-not [string]::IsNullOrWhiteSpace($appToken))
                 {
@@ -80,7 +115,8 @@ New-UDPage -Name 'Job execution' -Url '/job/:id' -Content {
             }
 
             $backButtonParameters = @{
-                Text    = 'Back to module-first demo'
+                # 'Back to module-first demo'
+                Text    = $psuConfigDemoStrings.JobBackButton
                 Color   = 'primary'
                 Variant = 'contained'
                 Icon    = New-UDIcon -Icon 'ArrowLeft'

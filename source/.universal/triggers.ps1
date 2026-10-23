@@ -1,1 +1,9 @@
-﻿# New-PSUTrigger -Name "Trigger" -EventType "UserLogin" -Environment "PowerShell 7" -TriggerScript "Get-SomeScript.ps1"
+﻿$localizationTriggerParameters = @{
+    Name          = 'Initialize PSUConfig localization cache'
+    EventType     = 'ServerStarted'
+    Environment   = 'PSUConfig'
+    TriggerScript = 'PSUConfig\Initialize-PSUConfigLocalizationCache'
+    Delay         = 10
+}
+
+New-PSUTrigger @localizationTriggerParameters

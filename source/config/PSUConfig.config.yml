@@ -1,7 +1,10 @@
 Environments:
   DEV:
     UniversalServerUrl: 'http://localhost:5000'
+    DefaultUILanguage: 'en'
   QA:
     UniversalServerUrl: 'https://psuconfig-qa.synedgy.com/'
+    DefaultUILanguage: 'en'
   PROD:
     UniversalServerUrl: 'https://psuconfig.synedgy.com/'
+    DefaultUILanguage: 'en'

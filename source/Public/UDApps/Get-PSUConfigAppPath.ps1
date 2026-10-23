@@ -1,4 +1,4 @@
-function Get-UDAppPath
+function Get-PSUConfigAppPath
 {
     <#
         .SYNOPSIS
@@ -12,7 +12,7 @@ function Get-UDAppPath
         The name of the app folder. Defaults to 'PSUConfigDemo'.
 
         .EXAMPLE
-        Get-UDAppPath -AppName 'PSUConfigDemo'
+        Get-PSUConfigAppPath -AppName 'PSUConfigDemo'
     #>
     [CmdletBinding()]
     [OutputType([System.String])]
@@ -23,5 +23,6 @@ function Get-UDAppPath
         $AppName = 'PSUConfigDemo'
     )
 
-    return (Join-Path -Path $MyInvocation.MyCommand.Module.ModuleBase -ChildPath "Apps/$AppName/" -Resolve)
+    $appPath = Join-Path -Path (Get-PSUConfigModule).ModuleBase -ChildPath 'Apps'
+    return (Join-Path -Path $appPath -ChildPath $AppName -Resolve)
 }

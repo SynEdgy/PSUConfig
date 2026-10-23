@@ -14,10 +14,15 @@ function New-PSUConfigAddUserButton
         .PARAMETER SyncElementId
             Specifies the dashboard element refreshed after creating a user.
 
-        .EXAMPLE
-            New-PSUConfigAddUserButton -SyncElementId 'usersRegion'
+        .PARAMETER Language
+            Specifies the requested language for the component-owned
+            PSUConfig.AddUserButton localization resource.
 
-            Renders the add-user action and refreshes usersRegion after submission.
+        .EXAMPLE
+            New-PSUConfigAddUserButton -SyncElementId 'usersRegion' -Language 'fr'
+
+            Renders the localized add-user action and refreshes usersRegion
+            after submission.
     #>
     [CmdletBinding(
         SupportsShouldProcess = $true,
@@ -32,11 +37,26 @@ function New-PSUConfigAddUserButton
 
         [Parameter()]
         [System.String]
-        $SyncElementId = 'psuConfigUsersRegion'
+        $SyncElementId = 'psuConfigUsersRegion',
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Language
     )
+
+    $psuConfigAddUserButtonStringsParameters = @{
+        Name              = 'PSUConfig.AddUserButton'
+        Language          = $Language
+        DefaultUILanguage = (Get-PSUConfigSetting).DefaultUILanguage
+        Cache             = $Cache:PSUConfigLocalization
+    }
+    $psuConfigAddUserButtonStrings = Get-PSUComponentLocalizedData @psuConfigAddUserButtonStringsParameters
 
     $resolvedSyncElementId = $SyncElementId
     $Page:PSUConfigAddUserButtonSyncElementId = $resolvedSyncElementId
+    $Page:PSUConfigAddUserButtonStrings = $psuConfigAddUserButtonStrings
+    $Page:PSUConfigAddUserButtonLanguage = $Language
 
     if ($PSCmdlet.ShouldProcess($Id, 'Render add PSUConfig user button'))
     {
@@ -48,17 +68,20 @@ function New-PSUConfigAddUserButton
                 Color   = 'primary'
                 OnClick = {
                     Show-UDModal -Content {
-                        New-UDCard -Title 'Add PSUConfig user' -Content {
+                        # 'Add PSUConfig user'
+                        New-UDCard -Title $Page:PSUConfigAddUserButtonStrings.ModalTitle -Content {
                             $formParameters = @{
                                 FormId        = 'addPSUConfigUserForm'
                                 SyncElementId = $Page:PSUConfigAddUserButtonSyncElementId
+                                Language      = $Page:PSUConfigAddUserButtonLanguage
                                 Confirm       = $false
                             }
 
                             New-PSUConfigUserForm @formParameters
                         }
                     } -Footer {
-                        New-UDButton -Text 'Cancel' -OnClick {
+                        # 'Cancel'
+                        New-UDButton -Text $Page:PSUConfigAddUserButtonStrings.Cancel -OnClick {
                             Hide-UDModal
                         }
                     }
@@ -66,8 +89,8 @@ function New-PSUConfigAddUserButton
             }
 
             New-UDFloatingActionButton @buttonParameters
-        } -TooltipContent {
-            New-UDTypography -Text 'Add PSUConfig user' -Variant body1
+            # 'Add PSUConfig user'
+            New-UDTypography -Text $psuConfigAddUserButtonStrings.Tooltip -Variant body1
         } -FollowCursor -LeaveDelay 5000
     }
 }

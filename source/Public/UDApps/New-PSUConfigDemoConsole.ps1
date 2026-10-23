@@ -48,21 +48,89 @@ function New-PSUConfigDemoConsole
             DisableThemeToggle    = $false
             Logo                  = $logoUrl
             HeaderPosition        = 'sticky'
-            Navigation            = @(
-                New-UDList -Children {
-                    $homeParameters = @{
-                        Label = 'Module-first demo'
-                        Href  = '/'
-                        Icon  = New-UDIcon -Icon 'Cubes'
-                    }
-                    New-UDListItem @homeParameters
+            HeaderContent         = {
+                $moduleBase = (Get-PSUConfigModule).ModuleBase
+                $defaultUILanguage = (Get-PSUConfigSetting).DefaultUILanguage
+                if ($null -eq $defaultUILanguage)
+                {
+                    $defaultUILanguage = 'en'
+                }
 
-                    $usersParameters = @{
-                        Label = 'Users'
-                        Href  = '/users'
-                        Icon  = New-UDIcon -Icon 'Users'
+                $languageParameters = @{
+                    ModuleBase        = $moduleBase
+                    Name              = 'PSUConfigDemo'
+                    PreferredLanguage = [System.String] $Cookies['PSUConfigLanguage']
+                    AcceptLanguage    = [System.String] $Headers['Accept-Language']
+                    DefaultUILanguage = $defaultUILanguage
+                }
+                $language = Resolve-PSULocalizationLanguage @languageParameters
+
+                $languageSelectorParameters = @{
+                    ModuleBase       = $moduleBase
+                    Language         = $language
+                    Name             = 'PSUConfigDemo'
+                    CookieName       = 'PSUConfigLanguage'
+                    UseLanguageLabel = $true
+                    ClassName        = 'psuconfig-language-selector'
+                    Sx               = @{
+                        minWidth    = '88px'
+                        marginRight = '12px'
+                        alignSelf   = 'center'
+                        height      = '36px'
+                        '& .MuiSelect-select' = @{
+                            paddingTop    = '2px'
+                            paddingBottom = '2px'
+                        }
                     }
-                    New-UDListItem @usersParameters
+                    Confirm          = $false
+                }
+                New-UDLanguageSelector @languageSelectorParameters
+            }
+            Navigation            = @(
+                New-UDDynamic -Id 'psuconfig-navigation' -Content {
+                    $moduleBase = (Get-PSUConfigModule).ModuleBase
+                    $defaultUILanguage = (Get-PSUConfigSetting).DefaultUILanguage
+                    if ($null -eq $defaultUILanguage)
+                    {
+                        $defaultUILanguage = 'en'
+                    }
+
+                    $navigationLanguageParameters = @{
+                        ModuleBase        = $moduleBase
+                        Name              = 'PSUConfigDemo'
+                        PreferredLanguage = [System.String] $Cookies['PSUConfigLanguage']
+                        AcceptLanguage    = [System.String] $Headers['Accept-Language']
+                        DefaultUILanguage = $defaultUILanguage
+                    }
+                    $navigationLanguage = Resolve-PSULocalizationLanguage @navigationLanguageParameters
+                    if ($null -eq $Cache:PSUConfigLocalization)
+                    {
+                        $Cache:PSUConfigLocalization = [System.Collections.Hashtable]::Synchronized(@{})
+                    }
+
+                    $psuConfigDemoStringsParameters = @{
+                        Language = $navigationLanguage
+                        Cache    = $Cache:PSUConfigLocalization
+                    }
+                    $psuConfigDemoStrings = Get-PSUConfigLocalizedData @psuConfigDemoStringsParameters
+
+                    New-UDList -Children {
+                        $homeParameters = @{
+                            # 'Module-first demo'
+                            Label = $psuConfigDemoStrings.NavigationHome
+                            Href  = '/'
+                            Icon  = New-UDIcon -Icon 'Cubes'
+                        }
+                        New-UDListItem @homeParameters
+
+                        $usersParameters = @{
+                            # 'Users'
+                            Label = $psuConfigDemoStrings.NavigationUsers
+                            Href  = '/users'
+                            Icon  = New-UDIcon -Icon 'Users'
+                        }
+                        New-UDListItem @usersParameters
+                    }
                 }
             )
             NavigationLayout      = 'Permanent'

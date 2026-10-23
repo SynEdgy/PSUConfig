@@ -24,21 +24,21 @@ AfterAll {
     Remove-Module -Name $script:moduleName
 }
 
-Describe 'Get-UDAppPath' {
+Describe 'Get-PSUConfigAppPath' {
     It 'Should be available as an exported command' {
-        $command = Get-Command -Name Get-UDAppPath -Module $script:moduleName -ErrorAction Stop
+        $command = Get-Command -Name Get-PSUConfigAppPath -Module $script:moduleName -ErrorAction Stop
 
         $command | Should -Not -BeNullOrEmpty
     }
 
     It 'Should default AppName to PSUConfigDemo and resolve an existing path' {
-        $result = PSUConfig\Get-UDAppPath
+        $result = PSUConfig\Get-PSUConfigAppPath
 
         $result | Should -Not -BeNullOrEmpty
         Split-Path -Path $result -Leaf | Should -Be 'PSUConfigDemo'
     }
 
     It 'Should throw when the requested app folder does not exist' {
-        { PSUConfig\Get-UDAppPath -AppName 'NonExistentApp' -ErrorAction Stop } | Should -Throw
+        { PSUConfig\Get-PSUConfigAppPath -AppName 'NonExistentApp' -ErrorAction Stop } | Should -Throw
     }
 }

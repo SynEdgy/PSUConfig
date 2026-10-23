@@ -1,9 +1,34 @@
 New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
-    $moduleBase = (Get-Module -Name 'PSUConfig').ModuleBase
+    $moduleBase = (Get-PSUConfigModule).ModuleBase
     $Cache:PSUConfigHeroImagePath = Join-Path -Path $moduleBase -ChildPath 'Apps'
     $Cache:PSUConfigHeroImagePath = Join-Path -Path $Cache:PSUConfigHeroImagePath -ChildPath 'PSUConfigDemo'
     $Cache:PSUConfigHeroImagePath = Join-Path -Path $Cache:PSUConfigHeroImagePath -ChildPath 'assets'
     $Cache:PSUConfigHeroImagePath = Join-Path -Path $Cache:PSUConfigHeroImagePath -ChildPath 'powershell-cube.jpg'
+    $defaultUILanguage = (Get-PSUConfigSetting).DefaultUILanguage
+    if ($null -eq $defaultUILanguage)
+    {
+        $defaultUILanguage = 'en'
+    }
+
+    $languageParameters = @{
+        ModuleBase        = $moduleBase
+        Name              = 'PSUConfigDemo'
+        PreferredLanguage = [System.String] $Cookies['PSUConfigLanguage']
+        AcceptLanguage    = [System.String] $Headers['Accept-Language']
+        DefaultUILanguage = $defaultUILanguage
+    }
+    $language = Resolve-PSULocalizationLanguage @languageParameters
+    if ($null -eq $Cache:PSUConfigLocalization)
+    {
+        $Cache:PSUConfigLocalization = [System.Collections.Hashtable]::Synchronized(@{})
+    }
+
+    $psuConfigDemoStringsParameters = @{
+        Language = $language
+        Cache    = $Cache:PSUConfigLocalization
+    }
+    $psuConfigDemoStrings = Get-PSUConfigLocalizedData @psuConfigDemoStringsParameters
+    $Page:PSUConfigDemoStrings = $psuConfigDemoStrings
 
     $surfaceStyle = @{
         border       = '1px solid rgba(56,167,223,.24)'
@@ -67,12 +92,14 @@ New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
             } -Content {
                 New-UDGrid -Container -Spacing 4 -AlignItems center -Children {
                     New-UDGrid -Item -ExtraSmallSize 12 -MediumSize 8 -LargeSize 7 -Children {
-                        New-UDTypography -Text 'SYNEDGY · MODULE-FIRST AUTOMATION' -Variant overline -Style @{
+                        # 'SYNEDGY · MODULE-FIRST AUTOMATION'
+                        New-UDTypography -Text $psuConfigDemoStrings.HeroEyebrow -Variant overline -Style @{
                             color         = '#72D6FF'
                             fontWeight    = 800
                             letterSpacing = '0.16em'
                         }
-                        New-UDTypography -Text 'PowerShell Universal, managed as code.' -Variant h2 -Style @{
+                        # 'PowerShell Universal, managed as code.'
+                        New-UDTypography -Text $psuConfigDemoStrings.HeroTitle -Variant h2 -Style @{
                             color         = '#FFFFFF'
                             fontSize      = 'clamp(2.5rem, 5vw, 4.6rem)'
                             fontWeight    = 850
@@ -81,14 +108,16 @@ New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
                             maxWidth      = '800px'
                             marginTop     = '12px'
                         }
-                        New-UDTypography -Text 'One PowerShell module defines the commands, data model, APIs, AI tools, jobs, environments, roles, and application deployed to PSU.' -Variant h5 -Style @{
+                        # 'One PowerShell module defines the commands, data model, APIs, AI tools, jobs, environments, roles, and application deployed to PSU.'
+                        New-UDTypography -Text $psuConfigDemoStrings.HeroLead -Variant h5 -Style @{
                             color      = '#DCEEFF'
                             fontWeight = 500
                             lineHeight = 1.45
                             maxWidth   = '760px'
                             marginTop  = '20px'
                         }
-                        New-UDTypography -Text 'Sampler turns that repository into a repeatable build, test, package, and deployment pipeline created by SynEdgy.' -Style @{
+                        # 'Sampler turns that repository into a repeatable build, test, package, and deployment pipeline created by SynEdgy.'
+                        New-UDTypography -Text $psuConfigDemoStrings.HeroDelivery -Style @{
                             color      = '#B7CCE3'
                             fontSize   = '1.05rem'
                             lineHeight = 1.7
@@ -108,7 +137,8 @@ New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
                         }
 
                         $analysisButtonParameters = @{
-                            Text    = 'Run DB Analysis job'
+                            # 'Run DB Analysis job'
+                            Text    = $psuConfigDemoStrings.RunAnalysisButton
                             Color   = 'primary'
                             Variant = 'contained'
                             Size    = 'large'
@@ -140,10 +170,12 @@ New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
                                     $job = Invoke-PSUScript -Script $script @commonParameters
                                     if (-not $job -or [long]$job.Id -le 0)
                                     {
-                                        throw 'PowerShell Universal did not return a job identifier.'
+                                        # 'PowerShell Universal did not return a job identifier.'
+                                        throw $Page:PSUConfigDemoStrings.AnalysisJobIdMissing
                                     }
 
-                                    Show-UDToast -Message ("Database analysis job #{0} started." -f $job.Id) -Duration 3000
+                                    # 'Database analysis job #{0} started.'
+                                    Show-UDToast -Message ($Page:PSUConfigDemoStrings.AnalysisJobStarted -f $job.Id) -Duration 3000
                                     Invoke-UDRedirect -Url ('/job/{0}' -f $job.Id)
                                 }
                                 catch
@@ -171,10 +203,14 @@ New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
                     $settings = Get-PSUConfigSetting
                     $users = @(Get-PSUConfigUser)
                     $metrics = @(
-                        @{ Value = [string]$settings.CurrentEnvironment; Label = 'Active environment'; Icon = 'Sliders'; Color = '#38A7DF' }
-                        @{ Value = [string]$settings.SqliteDBConfig.Version; Label = 'Schema version'; Icon = 'Database'; Color = '#2167AE' }
-                        @{ Value = $users.Count; Label = 'Internal users'; Icon = 'Users'; Color = '#218A67' }
-                        @{ Value = '4'; Label = 'Delivery stages'; Icon = 'CodeBranch'; Color = '#E89A2D' }
+                        # 'Active environment'
+                        @{ Value = [string]$settings.CurrentEnvironment; Label = $Page:PSUConfigDemoStrings.MetricActiveEnvironment; Icon = 'Sliders'; Color = '#38A7DF' }
+                        # 'Schema version'
+                        @{ Value = [string]$settings.SqliteDBConfig.Version; Label = $Page:PSUConfigDemoStrings.MetricSchemaVersion; Icon = 'Database'; Color = '#2167AE' }
+                        # 'Internal users'
+                        @{ Value = $users.Count; Label = $Page:PSUConfigDemoStrings.MetricInternalUsers; Icon = 'Users'; Color = '#218A67' }
+                        # 'Delivery stages'
+                        @{ Value = '4'; Label = $Page:PSUConfigDemoStrings.MetricDeliveryStages; Icon = 'CodeBranch'; Color = '#E89A2D' }
                     )
 
                     New-UDGrid -Container -Spacing 3 -Children {
@@ -219,14 +255,24 @@ New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
             }
 
             New-UDElement -Tag 'section' -Attributes @{ style = @{ marginTop = '42px' } } -Content {
-                New-UDTypography -Text 'From repository to running platform' -Variant h3 -Style $headingStyle
-                New-UDTypography -Text 'The module is the source of truth. Sampler provides the repeatable path into PowerShell Universal.' -Style $textStyle -Sx $textSx
+                # 'From repository to running platform'
+                New-UDTypography -Text $psuConfigDemoStrings.DeliverySectionTitle -Variant h3 -Style $headingStyle
+                # 'The module is the source of truth. Sampler provides the repeatable path into PowerShell Universal.'
+                New-UDTypography -Text $psuConfigDemoStrings.DeliverySectionDescription -Style $textStyle -Sx $textSx
 
                 $stages = @(
-                    @{ Number = '01'; Title = 'Author'; Text = 'PowerShell commands, YAML schemas, app pages, and .universal resource declarations live together.'; Icon = 'Code' }
-                    @{ Number = '02'; Title = 'Build and test'; Text = 'ModuleBuilder assembles the module while Pester and Playwright validate behavior and deployment surfaces.'; Icon = 'Vial' }
-                    @{ Number = '03'; Title = 'Package'; Text = 'Sampler produces an offline PSU automation repository with the module and its required dependencies.'; Icon = 'BoxOpen' }
-                    @{ Number = '04'; Title = 'Deploy'; Text = 'The repository is pushed to PSU, configuration is reconciled, and the demo token is provisioned.'; Icon = 'CloudArrowUp' }
+                    # 'Author'
+                    # 'PowerShell commands, YAML schemas, app pages, and .universal resource declarations live together.'
+                    @{ Number = '01'; Title = $psuConfigDemoStrings.StageAuthorTitle; Text = $psuConfigDemoStrings.StageAuthorDescription; Icon = 'Code' }
+                    # 'Build and test'
+                    # 'ModuleBuilder assembles the module while Pester and Playwright validate behavior and deployment surfaces.'
+                    @{ Number = '02'; Title = $psuConfigDemoStrings.StageBuildTitle; Text = $psuConfigDemoStrings.StageBuildDescription; Icon = 'Vial' }
+                    # 'Package'
+                    # 'Sampler produces an offline PSU automation repository with the module and its required dependencies.'
+                    @{ Number = '03'; Title = $psuConfigDemoStrings.StagePackageTitle; Text = $psuConfigDemoStrings.StagePackageDescription; Icon = 'BoxOpen' }
+                    # 'Deploy'
+                    # 'The repository is pushed to PSU, configuration is reconciled, and the demo token is provisioned.'
+                    @{ Number = '04'; Title = $psuConfigDemoStrings.StageDeployTitle; Text = $psuConfigDemoStrings.StageDeployDescription; Icon = 'CloudArrowUp' }
                 )
 
                 New-UDGrid -Container -Spacing 3 -Children {
@@ -253,14 +299,24 @@ New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
             New-UDGrid -Container -Spacing 3 -Style @{ marginTop = '42px' } -Children {
                 New-UDGrid -Item -ExtraSmallSize 12 -LargeSize 7 -Children {
                     New-UDPaper -Elevation 3 -Style $surfaceStyle -Children {
-                        New-UDTypography -Text 'One module, every PSU surface' -Variant h4 -Style $headingStyle
-                        New-UDTypography -Text 'The same versioned module supplies commands and the configuration that exposes them.' -Style $textStyle -Sx $textSx
+                        # 'One module, every PSU surface'
+                        New-UDTypography -Text $psuConfigDemoStrings.SurfacesSectionTitle -Variant h4 -Style $headingStyle
+                        # 'The same versioned module supplies commands and the configuration that exposes them.'
+                        New-UDTypography -Text $psuConfigDemoStrings.SurfacesSectionDescription -Style $textStyle -Sx $textSx
 
                         $capabilities = @(
-                            @{ Label = 'Commands'; Detail = 'Typed PowerShell functions and SQLite CRUD'; Icon = 'Terminal' }
-                            @{ Label = 'Configuration'; Detail = 'Apps, APIs, jobs, roles, environments, and variables'; Icon = 'Gear' }
-                            @{ Label = 'Interfaces'; Detail = 'PowerShell, REST, dashboard, and AI tools'; Icon = 'ShareNodes' }
-                            @{ Label = 'Operations'; Detail = 'Job output, deployment notifications, and smoke tests'; Icon = 'ChartLine' }
+                            # 'Commands'
+                            # 'Typed PowerShell functions and SQLite CRUD'
+                            @{ Label = $psuConfigDemoStrings.CapabilityCommandsLabel; Detail = $psuConfigDemoStrings.CapabilityCommandsDetail; Icon = 'Terminal' }
+                            # 'Configuration'
+                            # 'Apps, APIs, jobs, roles, environments, and variables'
+                            @{ Label = $psuConfigDemoStrings.CapabilityConfigurationLabel; Detail = $psuConfigDemoStrings.CapabilityConfigurationDetail; Icon = 'Gear' }
+                            # 'Interfaces'
+                            # 'PowerShell, REST, dashboard, and AI tools'
+                            @{ Label = $psuConfigDemoStrings.CapabilityInterfacesLabel; Detail = $psuConfigDemoStrings.CapabilityInterfacesDetail; Icon = 'ShareNodes' }
+                            # 'Operations'
+                            # 'Job output, deployment notifications, and smoke tests'
+                            @{ Label = $psuConfigDemoStrings.CapabilityOperationsLabel; Detail = $psuConfigDemoStrings.CapabilityOperationsDetail; Icon = 'ChartLine' }
                         )
                         foreach ($capability in $capabilities)
                         {
@@ -284,7 +340,8 @@ New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
 
                 New-UDGrid -Item -ExtraSmallSize 12 -LargeSize 5 -Children {
                     New-UDPaper -Elevation 3 -Style $surfaceStyle -Children {
-                        New-UDTypography -Text 'Active target' -Variant h4 -Style $headingStyle
+                        # 'Active target'
+                        New-UDTypography -Text $psuConfigDemoStrings.TargetSectionTitle -Variant h4 -Style $headingStyle
                         $settings = Get-PSUConfigSetting
                         New-UDPaper -Elevation 0 -Style @{
                             border       = '1px solid rgba(56,167,223,.24)'
@@ -296,11 +353,15 @@ New-UDPage -Name 'Module-first PSU configuration' -Url '/' -Content {
                             flexDirection = 'column'
                             gap          = '4px'
                         } -Children {
-                            New-UDTypography -Text ('Environment: {0}' -f $settings.CurrentEnvironment)
-                            New-UDTypography -Text ('UniversalServerUrl: {0}' -f $settings.UniversalServerUrl)
-                            New-UDTypography -Text ('Schema: {0}' -f $settings.SqliteDBConfig.Version)
+                            # 'Environment: {0}'
+                            New-UDTypography -Text ($psuConfigDemoStrings.TargetEnvironment -f $settings.CurrentEnvironment)
+                            # 'UniversalServerUrl: {0}'
+                            New-UDTypography -Text ($psuConfigDemoStrings.TargetUniversalServerUrl -f $settings.UniversalServerUrl)
+                            # 'Schema: {0}'
+                            New-UDTypography -Text ($psuConfigDemoStrings.TargetSchema -f $settings.SqliteDBConfig.Version)
                         }
-                        New-UDTypography -Text 'Switch DEV, QA, or PROD through the environment-aware YAML configuration without changing application code.' -Style $textStyle -Sx $textSx
+                        # 'Switch DEV, QA, or PROD through the environment-aware YAML configuration without changing application code.'
+                        New-UDTypography -Text $psuConfigDemoStrings.TargetDescription -Style $textStyle -Sx $textSx
                     }
                 }
             }

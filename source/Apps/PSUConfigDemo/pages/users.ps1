@@ -1,5 +1,39 @@
 New-UDPage -Name 'PSUConfig users' -Url '/users' -Content {
-    New-PSUConfigAddUserButton -Id 'addPSUConfigUser' -SyncElementId 'psuConfigUsersRegion' -Confirm:$false
+    $module = Get-PSUConfigModule
+    $moduleBase = $module.ModuleBase
+    $defaultUILanguage = (Get-PSUConfigSetting).DefaultUILanguage
+    if ($null -eq $defaultUILanguage)
+    {
+        $defaultUILanguage = 'en'
+    }
+
+    $languageParameters = @{
+        ModuleBase        = $moduleBase
+        Name              = 'PSUConfig.Users'
+        PreferredLanguage = [System.String] $Cookies['PSUConfigLanguage']
+        AcceptLanguage    = [System.String] $Headers['Accept-Language']
+        DefaultUILanguage = $defaultUILanguage
+    }
+    $language = Resolve-PSULocalizationLanguage @languageParameters
+    if ($null -eq $Cache:PSUConfigLocalization)
+    {
+        $Cache:PSUConfigLocalization = [System.Collections.Hashtable]::Synchronized(@{})
+    }
+
+    $psuConfigUsersStringsParameters = @{
+        Name     = 'PSUConfig.Users'
+        Language = $language
+        Cache    = $Cache:PSUConfigLocalization
+    }
+    $psuConfigUsersStrings = Get-PSUConfigLocalizedData @psuConfigUsersStringsParameters
+
+    $addUserButtonParameters = @{
+        Id            = 'addPSUConfigUser'
+        SyncElementId = 'psuConfigUsersRegion'
+        Language      = $language
+        Confirm       = $false
+    }
+    New-PSUConfigAddUserButton @addUserButtonParameters
 
     New-UDElement -Tag 'main' -Attributes @{
         style = @{
@@ -14,17 +48,20 @@ New-UDPage -Name 'PSUConfig users' -Url '/users' -Content {
                 margin   = '0 auto'
             }
         } -Content {
-            New-UDTypography -Text 'SYNEDGY · SQLITE DATA' -Variant overline -Style @{
+            # 'SYNEDGY · SQLITE DATA'
+            New-UDTypography -Text $psuConfigUsersStrings.PageEyebrow -Variant overline -Style @{
                 color         = '#38A7DF'
                 fontWeight    = 800
                 letterSpacing = '0.14em'
             }
-            New-UDTypography -Text 'PSUConfig users' -Variant h3 -Style @{
+            # 'PSUConfig users'
+            New-UDTypography -Text ($psuConfigUsersStrings.PageTitle -f $module.Name) -Variant h3 -Style @{
                 fontWeight    = 850
                 letterSpacing = '-0.035em'
                 marginBottom  = '8px'
             }
-            New-UDTypography -Text 'User records loaded through the module-first Get-PSUConfigUser command.' -Sx @{
+            # 'User records loaded through the module-first Get-PSUConfigUser command.'
+            New-UDTypography -Text ($psuConfigUsersStrings.PageDescription -f 'Get-PSUConfigUser') -Sx @{
                 color = 'text.secondary'
             } -Style @{
                 marginBottom = '24px'
@@ -38,9 +75,9 @@ New-UDPage -Name 'PSUConfig users' -Url '/users' -Content {
                 New-UDDynamic -Id 'psuConfigUsersRegion' -Content {
                     $tableParameters = @{
                         Id            = 'psuConfigUsers'
-                        Title         = 'Internal users'
                         PageSize      = 10
                         SyncElementId = 'psuConfigUsersRegion'
+                        Language      = $language
                         Confirm       = $false
                     }
 
