@@ -1,18 +1,18 @@
-function Remove-myUser
+function Remove-PSUConfigUser
 {
     <#
         .SYNOPSIS
             Removes a user record from the PSUConfig SQLite database.
 
         .DESCRIPTION
-            Deletes the myUser table row identified by the supplied record identifier
+            Deletes the psuConfigUser table row identified by the supplied record identifier
             after PowerShell confirms that the destructive operation should proceed.
 
         .PARAMETER id
             Specifies the database identifier of the user record that will be removed.
 
         .EXAMPLE
-            Remove-myUser -id 42 -Confirm:$false
+            Remove-PSUConfigUser -id 42 -Confirm:$false
 
             Removes the user record with identifier 42 without an interactive prompt.
     #>
@@ -27,14 +27,14 @@ function Remove-myUser
 
     $removePSSqliteRowParameters = @{
         SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
-        TableName      = 'myUser'
+        TableName      = 'psuConfigUser'
         ClauseData     = @{
             id = $id
         }
         Verbose        = $Verbose.IsPresent -or $VerbosePreference -in @('Continue', 'Inquire')
     }
 
-    if ($PSCmdlet.ShouldProcess([System.String]$id, 'Remove myUser record'))
+    if ($PSCmdlet.ShouldProcess([System.String]$id, 'Remove PSUConfig user record'))
     {
         Remove-PSSqliteRow @removePSSqliteRowParameters
     }

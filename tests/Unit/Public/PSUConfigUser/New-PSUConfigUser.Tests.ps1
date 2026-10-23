@@ -27,24 +27,34 @@ AfterAll {
     Remove-Module -Name $script:moduleName
 }
 
-Describe 'Remove-myUser' {
+Describe 'New-PSUConfigUser' {
     BeforeAll {
         $script:databaseConfig = [synedgy.PSSqlite.SqliteDBConfig]::new($TestDrive, 'PSUConfig.db')
         Mock -CommandName Get-PSUConfigDatabaseConfiguration -MockWith { $script:databaseConfig }
-        Mock -CommandName Remove-PSSqliteRow
+        Mock -CommandName New-PSSqliteRow
     }
 
-    It 'Should remove the row matching the supplied identifier' {
-        PSUConfig\Remove-myUser -id 42 -Confirm:$false
+    It 'Should insert the supplied user data with a creation timestamp' {
+        $parameters = @{
+            FirstName = 'Ada'
+            LastName  = 'Lovelace'
+            Username  = 'ada'
+            Email     = 'ada@example.com'
+            Confirm   = $false
+        }
 
-        Should -Invoke -CommandName Remove-PSSqliteRow -Exactly -Times 1 -Scope It -ParameterFilter {
-            $TableName -eq 'myUser' -and $ClauseData.id -eq 42
+        PSUConfig\New-PSUConfigUser @parameters
+
+        Should -Invoke -CommandName New-PSSqliteRow -Exactly -Times 1 -Scope It -ParameterFilter {
+            $TableName -eq 'psuConfigUser' -and
+            $RowData.FirstName -eq 'Ada' -and
+            $RowData.ContainsKey('createdOn')
         }
     }
 
-    It 'Should not remove a row when WhatIf is used' {
-        PSUConfig\Remove-myUser -id 42 -WhatIf
+    It 'Should not insert a row when WhatIf is used' {
+        PSUConfig\New-PSUConfigUser -FirstName 'Ada' -LastName 'Lovelace' -Username 'ada' -Email 'ada@example.com' -WhatIf
 
-        Should -Invoke -CommandName Remove-PSSqliteRow -Exactly -Times 0 -Scope It
+        Should -Invoke -CommandName New-PSSqliteRow -Exactly -Times 0 -Scope It
     }
 }

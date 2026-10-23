@@ -1,6 +1,5 @@
 ---
 WorkspaceModules:
-  - synedgy.universal.helper
   - synedgy.PSSqlite
   - Sampler.PowerShellUniversalTasks
 
@@ -14,6 +13,9 @@ WorkspaceModules:
 BuiltModuleSubdirectory: module
 CopyPaths:
   - en-US
+  - en
+  - de
+  - fr
   - .universal
   - images
   - config
@@ -40,8 +42,7 @@ VersionedOutputDirectory: true
 
 # NestedModule bundling has been removed: powershell-yaml, synedgy.PSSqlite,
 # and synedgy.universal.helper are now resolved as ordinary RequiredModules
-# (see source/PSUConfig.psd1), which also lets synedgy.universal.helper be
-# linked live from the workspace via WorkspaceModules during local builds.
+# (see source/PSUConfig.psd1).
 
 ####################################################
 #      PowerShell Universal Task Configuration     #

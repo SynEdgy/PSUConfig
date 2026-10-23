@@ -37,12 +37,12 @@ function Get-PSUConfigDatabaseConfiguration
     if (-not [string]::IsNullOrWhiteSpace($ConfigFile))
     {
         Write-Verbose -Message ('Loading SQLite configuration from {0}' -f $ConfigFile)
-        $script:MyModuleDBConfig = Get-PSSqliteDBConfig -ConfigFile $ConfigFile
-        return $script:MyModuleDBConfig
+        $script:PSUConfigDatabaseConfiguration = Get-PSSqliteDBConfig -ConfigFile $ConfigFile
+        return $script:PSUConfigDatabaseConfiguration
     }
 
     $moduleConfig = Get-PSUConfigSetting -Force:$Force.IsPresent
-    $script:MyModuleDBConfig = $moduleConfig.SqliteDBConfig
+    $script:PSUConfigDatabaseConfiguration = $moduleConfig.SqliteDBConfig
 
-    $script:MyModuleDBConfig
+    $script:PSUConfigDatabaseConfiguration
 }

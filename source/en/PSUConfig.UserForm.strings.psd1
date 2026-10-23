@@ -1,0 +1,15 @@
+@{
+    FirstNameLabel       = 'First name'
+    FirstNamePlaceholder = 'Ada'
+    LastNameLabel        = 'Last name'
+    LastNamePlaceholder  = 'Lovelace'
+    UsernameLabel        = 'Username'
+    UsernamePlaceholder  = 'ada'
+    EmailLabel           = 'Email'
+    EmailPlaceholder     = 'ada@example.com'
+    CreateSubmit         = 'Create user'
+    UpdateSubmit         = 'Save changes'
+    RequiredFieldsMessage = 'Complete the required fields: {0}.'
+    UserCreatedMessage   = 'User {0} created.'
+    UserUpdatedMessage   = 'User {0} updated.'
+}

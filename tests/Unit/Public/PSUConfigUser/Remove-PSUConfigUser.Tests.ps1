@@ -27,28 +27,24 @@ AfterAll {
     Remove-Module -Name $script:moduleName
 }
 
-Describe 'Set-myUser' {
+Describe 'Remove-PSUConfigUser' {
     BeforeAll {
         $script:databaseConfig = [synedgy.PSSqlite.SqliteDBConfig]::new($TestDrive, 'PSUConfig.db')
         Mock -CommandName Get-PSUConfigDatabaseConfiguration -MockWith { $script:databaseConfig }
-        Mock -CommandName Set-PSSqliteRow
+        Mock -CommandName Remove-PSSqliteRow
     }
 
-    It 'Should update supplied fields and add an update timestamp' {
-        PSUConfig\Set-myUser -id 42 -Email 'ada@example.com' -Confirm:$false
+    It 'Should remove the row matching the supplied identifier' {
+        PSUConfig\Remove-PSUConfigUser -id 42 -Confirm:$false
 
-        Should -Invoke -CommandName Set-PSSqliteRow -Exactly -Times 1 -Scope It -ParameterFilter {
-            $TableName -eq 'myUser' -and
-            $ClauseData.id -eq 42 -and
-            $RowData.Email -eq 'ada@example.com' -and
-            $RowData.ContainsKey('updatedOn') -and
-            -not $RowData.ContainsKey('id')
+        Should -Invoke -CommandName Remove-PSSqliteRow -Exactly -Times 1 -Scope It -ParameterFilter {
+            $TableName -eq 'psuConfigUser' -and $ClauseData.id -eq 42
         }
     }
 
-    It 'Should not update a row when WhatIf is used' {
-        PSUConfig\Set-myUser -id 42 -Email 'ada@example.com' -WhatIf
+    It 'Should not remove a row when WhatIf is used' {
+        PSUConfig\Remove-PSUConfigUser -id 42 -WhatIf
 
-        Should -Invoke -CommandName Set-PSSqliteRow -Exactly -Times 0 -Scope It
+        Should -Invoke -CommandName Remove-PSSqliteRow -Exactly -Times 0 -Scope It
     }
 }

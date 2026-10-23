@@ -24,7 +24,7 @@ AfterAll {
 Describe 'Get-CurrentEnvironment' {
     BeforeEach {
         InModuleScope $script:moduleName {
-            $script:Environment = $null
+            $script:PSUConfigEnvironment = $null
         }
         $env:ServerEnvironment = $null
     }

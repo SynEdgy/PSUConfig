@@ -1,11 +1,11 @@
-function Get-myUser
+function Get-PSUConfigUser
 {
     <#
         .SYNOPSIS
             Gets user records from the PSUConfig SQLite database.
 
         .DESCRIPTION
-            Queries the myUser table with optional exact, wildcard, and date-range
+            Queries the psuConfigUser table with optional exact, wildcard, and date-range
             filters and returns every database row matching the supplied criteria.
 
         .PARAMETER id
@@ -39,15 +39,15 @@ function Get-myUser
             Returns records updated after the supplied date and time boundary.
 
         .EXAMPLE
-            Get-myUser -username 'ada*'
+            Get-PSUConfigUser -username 'ada*'
 
             Returns user records whose username begins with the supplied text.
     #>
     [CmdletBinding()]
     [APIEndpoint(
-        Name = 'getmyUser',
-        Path = '/myUser',
-        Description = 'Get myUser records from the local database.',
+        Name = 'getPSUConfigUser',
+        Path = '/psuConfigUser',
+        Description = 'Get PSUConfig user records from the local database.',
         Method = 'GET',
         Authentication = $false,
         Role = ('admin','user'),
@@ -109,7 +109,7 @@ function Get-myUser
 
     $getPSSqliteRowParameters = @{
         SqliteDBConfig = (Get-PSUConfigDatabaseConfiguration)
-        TableName      = 'myUser'
+        TableName      = 'psuConfigUser'
         ClauseData     = $PSBoundParameters
         Verbose        = $Verbose.IsPresent -or $VerbosePreference -in @('Continue', 'Inquire')
     }

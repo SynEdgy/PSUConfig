@@ -27,23 +27,28 @@ AfterAll {
     Remove-Module -Name $script:moduleName
 }
 
-Describe 'Get-myUser' {
+Describe 'Set-PSUConfigUser' {
     BeforeAll {
         $script:databaseConfig = [synedgy.PSSqlite.SqliteDBConfig]::new($TestDrive, 'PSUConfig.db')
         Mock -CommandName Get-PSUConfigDatabaseConfiguration -MockWith { $script:databaseConfig }
-        Mock -CommandName Get-PSSqliteRow -MockWith {
-            [pscustomobject]@{ username = 'ada' }
+        Mock -CommandName Set-PSSqliteRow
+    }
+
+    It 'Should update supplied fields and add an update timestamp' {
+        PSUConfig\Set-PSUConfigUser -id 42 -Email 'ada@example.com' -Confirm:$false
+
+        Should -Invoke -CommandName Set-PSSqliteRow -Exactly -Times 1 -Scope It -ParameterFilter {
+            $TableName -eq 'psuConfigUser' -and
+            $ClauseData.id -eq 42 -and
+            $RowData.Email -eq 'ada@example.com' -and
+            $RowData.ContainsKey('updatedOn') -and
+            -not $RowData.ContainsKey('id')
         }
     }
 
-    It 'Should forward filters to the PSSqlite row query' {
-        $result = PSUConfig\Get-myUser -username 'ada*' -createdOnAfter ([datetime]'2026-01-01')
+    It 'Should not update a row when WhatIf is used' {
+        PSUConfig\Set-PSUConfigUser -id 42 -Email 'ada@example.com' -WhatIf
 
-        $result.username | Should -Be 'ada'
-        Should -Invoke -CommandName Get-PSSqliteRow -Exactly -Times 1 -Scope It -ParameterFilter {
-            $TableName -eq 'myUser' -and
-            $ClauseData.username -eq 'ada*' -and
-            $ClauseData.createdOnAfter -eq [datetime]'2026-01-01'
-        }
+        Should -Invoke -CommandName Set-PSSqliteRow -Exactly -Times 0 -Scope It
     }
 }

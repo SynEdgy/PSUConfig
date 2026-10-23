@@ -1,6 +1,10 @@
 # PSUConfig
 
-PowerShell Universal Instance Configuration
+PSUConfig is a SynEdgy demonstration of module-first PowerShell Universal
+configuration management and deployment. A single PowerShell module contains
+the commands, data schema, application, APIs, AI tools, jobs, roles, variables,
+environments, and PSU resource declarations, while Sampler provides the
+repeatable build, test, package, and deployment framework.
 
 ## Usage
 
@@ -39,3 +43,7 @@ Set-PSUConfigSetting -Environment QA -Confirm:$false
 ```
 
 The cached configuration is shared by module commands and the PSUConfig demo.
+
+## Troubleshooting
+
+- [PSU `Invoke-PSUScript`, `-Confirm`, and `ShouldProcess`](docs/psu-invoke-psuscript-confirm-shouldprocess.md)
