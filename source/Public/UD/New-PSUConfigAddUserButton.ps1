@@ -89,6 +89,7 @@ function New-PSUConfigAddUserButton
             }
 
             New-UDFloatingActionButton @buttonParameters
+        } -TooltipContent {
             # 'Add PSUConfig user'
             New-UDTypography -Text $psuConfigAddUserButtonStrings.Tooltip -Variant body1
         } -FollowCursor -LeaveDelay 5000

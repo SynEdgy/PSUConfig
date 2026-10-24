@@ -58,6 +58,7 @@ Describe 'New-PSUConfigAddUserButton' {
         $commandSource = $command.ScriptBlock.ToString()
 
         $commandSource | Should -Match 'New-UDFloatingActionButton'
+        $commandSource | Should -Match '} -TooltipContent {'
         $commandSource | Should -Match 'Show-UDModal'
         $commandSource | Should -Match 'New-UDCard -Title \$Page:PSUConfigAddUserButtonStrings\.ModalTitle'
         $commandSource | Should -Match 'New-PSUConfigUserForm @formParameters'
