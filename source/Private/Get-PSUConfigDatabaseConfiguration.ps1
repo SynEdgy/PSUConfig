@@ -41,8 +41,11 @@ function Get-PSUConfigDatabaseConfiguration
         return $script:PSUConfigDatabaseConfiguration
     }
 
-    $moduleConfig = Get-PSUConfigSetting -Force:$Force.IsPresent
-    $script:PSUConfigDatabaseConfiguration = $moduleConfig.SqliteDBConfig
+    if ($null -eq $script:PSUConfigDatabaseConfiguration -or $Force.IsPresent)
+    {
+        $moduleConfig = Get-PSUConfigSetting -Force:$Force.IsPresent
+        $script:PSUConfigDatabaseConfiguration = $moduleConfig.SqliteDBConfig
+    }
 
     $script:PSUConfigDatabaseConfiguration
 }

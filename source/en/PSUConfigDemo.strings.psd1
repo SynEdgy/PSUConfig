@@ -1,10 +1,11 @@
 @{
     NavigationHome                  = 'Module-first demo'
     NavigationUsers                 = 'Users'
-    HeroEyebrow                     = 'SYNEDGY - MODULE-FIRST AUTOMATION'
+    NavigationMonitoring            = 'Monitoring'
+    HeroEyebrow                     = 'SYNEDGY - MODULAR AUTOMATION'
     HeroTitle                       = 'PowerShell Universal, managed as code.'
     HeroLead                        = 'One PowerShell module defines the commands, data model, APIs, AI tools, jobs, environments, roles, and application deployed to PSU.'
-    HeroDelivery                    = 'Sampler turns that repository into a repeatable build, test, package, and deployment pipeline created by SynEdgy.'
+    HeroDelivery                    = 'Sampler turns that repository into a repeatable build, test, package, and deployment pipeline.'
     RunAnalysisButton               = 'Run DB Analysis job'
     AnalysisJobIdMissing            = 'PowerShell Universal did not return a job identifier.'
     AnalysisJobStarted              = 'Database analysis job #{0} started.'

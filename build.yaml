@@ -1,6 +1,8 @@
 ---
 WorkspaceModules:
+  - PSAwtrixNG
   - synedgy.PSSqlite
+  - synedgy.universal.helper
   - Sampler.PowerShellUniversalTasks
 
 ####################################################

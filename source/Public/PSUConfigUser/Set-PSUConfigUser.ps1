@@ -29,6 +29,16 @@ function Set-PSUConfigUser
             Updates the email address and modification timestamp for user record 42.
     #>
     [CmdletBinding(SupportsShouldProcess = $true)]
+    [APIEndpoint(
+        Name = 'setPSUConfigUser',
+        Path = '/psuConfigUser',
+        Description = 'Update a PSUConfig user record in the local database.',
+        Method = 'PUT',
+        Authentication = $false,
+        Role = ('admin','user'),
+        Tag = 'Users',
+        Timeout = 30
+    )]
     [OutputType([System.Object])]
     param
     (

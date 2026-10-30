@@ -6,6 +6,7 @@ New-PSUScript -Environment "PSUConfig" -Module 'PSUConfig' -Command 'Get-PSUConf
 New-PSUScript -Environment "PSUConfig" -Module 'PSUConfig' -Command 'Get-PSUConfigDatabaseAnalysis'
 New-PSUScript -Environment "PSUConfig" -Module 'PSUConfig' -Command 'Find-UserByCity'
 New-PSUScript -Environment "PSUConfig" -Module 'PSUConfig' -Command 'Initialize-PSUConfigLocalizationCache'
+New-PSUScript -Environment "PSUConfig" -Module 'PSUConfig' -Command 'Invoke-PSUConfigMonitoringJob'
 
 # New-PSUScript -Environment "PSUConfig" -Path 'scripts\Get-Process.ps1' -Description 'Get-Process.ps1' -Name 'Get-Process.ps1'
 # Above does not work yet because it needs building path from PSModuleBase. Adam has a ticket for this.

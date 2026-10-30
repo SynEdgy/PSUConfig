@@ -33,6 +33,7 @@
     'DscResource.DocGenerator'  = 'latest'
 
     'synedgy.pssqlite'          = 'latest'
+    PSAwtrixNG                  = 'latest'
     'synedgy.universal.helper'  = @{
         version = 'latest'
         Parameters = @{

@@ -7,3 +7,13 @@
 }
 
 New-PSUTrigger @localizationTriggerParameters
+
+$databaseTriggerParameters = @{
+    Name          = 'Initialize PSUConfig database'
+    EventType     = 'ServerStarted'
+    Environment   = 'PSUConfig'
+    TriggerScript = 'PSUConfig\Initialize-PSUConfigDB'
+    Delay         = 15
+}
+
+New-PSUTrigger @databaseTriggerParameters

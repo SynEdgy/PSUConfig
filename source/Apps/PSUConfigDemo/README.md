@@ -13,7 +13,7 @@ components rather than embedded theme CSS. Job pages use the shared
 `New-UDPsuJobHeader` and `New-UDPsuJobTerminalView` components from
 `synedgy.universal.helper`.
 
-The Home hero supports English (`en`) and French (`fr`) through data-only PSD1
+The Home hero supports English (`en`), French (`fr`), and German (`de`) through data-only PSD1
 resources bundled in the module. The app first uses the browser's
 `Accept-Language` header, including regional values such as `fr-FR` and
 `fr-CH`, then falls back to `DefaultUILanguage` from the active environment in
@@ -26,7 +26,7 @@ The header uses `New-UDLanguageSelector` from `synedgy.universal.helper`.
 Deferred dashboard callbacks obtain the deployed module through
 `Get-PSUConfigModule` and pass its `ModuleBase` explicitly to shared
 localization commands. This avoids relying on deferred callback call stacks.
-The demo enables compact labels so the header displays `EN` and `FR`.
+The demo enables compact labels so the header displays `EN`, `FR`, and `DE`.
 Component-local styling can be supplied through `Sx`, while `ClassName`
 provides a stable hook for a site stylesheet.
 
@@ -54,8 +54,9 @@ $usersStrings = Get-PSUConfigLocalizedData @usersStringsParameters
 The `PSUConfigDemo.strings.psd1` Home resources are bundled in English,
 French, and German.
 
-The bundled `PSUConfig.Users.psd1` resources localize the Users page heading
-and description in English and French.
+The bundled `PSUConfig.Users.psd1` and `PSUConfig.Monitoring.strings.psd1`
+resources localize the Users and Monitoring pages in English, French, and
+German.
 
 Dashboard components own their component-specific strings. For example,
 `New-PSUConfigAddUserButton` receives the page's resolved language and loads
@@ -125,6 +126,18 @@ for the native behavior and the custom workaround used here.
   that opens the same form with existing values and saves through
   `Set-PSUConfigUser`, plus a Remove action with explicit modal confirmation
   before `Remove-PSUConfigUser` deletes the row.
+- `Monitoring` (`/psuconfig-demo/monitoring`): runs a self-contained
+  SecureConnect security-operations workflow. PSUConfig bundles the simulated
+  machine inventory, persists security alerts and cached owner profiles in its
+  SQLite database, resolves owners from DummyJSON, verifies online health, and
+  starts module-backed alert and patch jobs. Patching requires both an
+  owner-notified confirmation and explicit operator approval, and the command
+  independently rejects offline machines. Alert jobs display a held critical
+  notification on the configured AWTRIX clock; patch jobs show an amber
+  in-progress message followed by a held green completion message. The
+  Monitoring page acknowledgement action clears the held clock notification
+  and moves detected alerts into investigation without changing completed
+  records.
 - `Job Info` (`/psuconfig-demo/job/:id`): renders the job header and terminal
   output view for the given job id.
 

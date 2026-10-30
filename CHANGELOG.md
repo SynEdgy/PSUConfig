@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Exposed `Get-PSUConfigUserProfile` as a generated PSU API endpoint in the
+  `PSUConfig` environment while keeping its strongly typed SQLite configuration
+  hidden from the public endpoint contract.
+- Exposed `Find-UserByCity`, `Get-Something`, and the complete
+  `Get`/`New`/`Set`/`Remove` PSUConfig user CRUD surface through generated API
+  endpoints in the `PSUConfig` environment.
+
+- Added a localized Monitoring page with a self-contained SecureConnect
+  detection, owner-enrichment, health-verification, and guarded remediation
+  workflow. The module now bundles its monitoring inventory, persists
+  `securityAlert` and `userProfile` records through synedgy.PSSqlite CRUD
+  commands, runs alert and patch operations as PSUConfig-owned jobs, and
+  displays critical, fixing, and completed workflow states on AWTRIX.
+- Improved the Monitoring response workflow as a connected four-stage timeline
+  and added an acknowledgement action to clear held AWTRIX notifications.
 - Added English, French, and German localization for the Home page, navigation,
   Users page header, and job execution page header with a top-right language
   selector. The browser `Accept-Language` header provides the request preference,

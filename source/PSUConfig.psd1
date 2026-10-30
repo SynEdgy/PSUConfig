@@ -44,6 +44,7 @@ PowerShellVersion = '5.0'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
+    'PSAwtrixNG',
     'powershell-yaml',
     'synedgy.PSSqlite',
     'synedgy.universal.helper'

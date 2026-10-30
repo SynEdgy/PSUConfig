@@ -1,6 +1,6 @@
 DatabasePath: '$Env:ProgramData\UniversalAutomation\Data\PSUConfig'
 databaseFile: 'PSUConfig.db'
-version: 0.0.2
+version: 0.0.3
 schema:
   Tables:
     psuConfigUser:
@@ -23,4 +23,54 @@ schema:
         createdOn:
           type: TEXT
         updatedOn:
+          type: TEXT
+    securityAlert:
+      columns:
+        id:
+          type: INTEGER
+          primaryKey: true
+          indexed: true
+        vulnerabilityId:
+          type: TEXT
+        severity:
+          type: TEXT
+        softwareName:
+          type: TEXT
+        affectedBeforeVersion:
+          type: TEXT
+        machineId:
+          type: TEXT
+        computerName:
+          type: TEXT
+        ownerId:
+          type: INTEGER
+        machineOnline:
+          type: INTEGER
+        status:
+          type: TEXT
+        psuJobId:
+          type: TEXT
+        createdOn:
+          type: TEXT
+        updatedOn:
+          type: TEXT
+    userProfile:
+      columns:
+        id:
+          type: INTEGER
+          primaryKey: true
+          indexed: true
+        firstName:
+          type: TEXT
+        lastName:
+          type: TEXT
+        displayName:
+          type: TEXT
+        email:
+          type: TEXT
+        department:
+          type: TEXT
+        title:
+          type: TEXT
+        syncedOn:
           type: TEXT

@@ -21,9 +21,14 @@ BeforeAll {
 
     Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
 
+    $existingPageDrive = Get-PSDrive -Name Page -ErrorAction SilentlyContinue
+    if ($existingPageDrive)
+    {
+        Remove-PSDrive -Name Page -Scope Global -Force -ErrorAction SilentlyContinue
+    }
     if (-not (Get-PSDrive -Name Page -ErrorAction SilentlyContinue))
     {
-        $null = New-PSDrive -Name Page -PSProvider Variable -Root '' -Scope Global -ErrorAction SilentlyContinue
+        $null = New-PSDrive -Name Page -PSProvider Variable -Root '' -Scope Global -ErrorAction Stop
         $script:removePageDrive = $true
     }
 

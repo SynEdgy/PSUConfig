@@ -130,6 +130,14 @@ function New-PSUConfigDemoConsole
                             Icon  = New-UDIcon -Icon 'Users'
                         }
                         New-UDListItem @usersParameters
+
+                        $monitoringParameters = @{
+                            # 'Monitoring'
+                            Label = $psuConfigDemoStrings.NavigationMonitoring
+                            Href  = '/monitoring'
+                            Icon  = New-UDIcon -Icon 'ShieldAlt'
+                        }
+                        New-UDListItem @monitoringParameters
                     }
                 }
             )

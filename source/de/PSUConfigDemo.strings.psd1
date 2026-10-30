@@ -1,6 +1,7 @@
 @{
     NavigationHome                  = 'Modulbasierte Demo'
     NavigationUsers                 = 'Benutzer'
+    NavigationMonitoring            = 'Monitoring'
     HeroEyebrow                     = 'SYNEDGY - MODULBASIERTE AUTOMATISIERUNG'
     HeroTitle                       = 'PowerShell Universal, als Code verwaltet.'
     HeroLead                        = 'Ein einziges PowerShell-Modul definiert die Befehle, das Datenmodell, APIs, KI-Tools, Jobs, Umgebungen, Rollen und die in PSU bereitgestellte Anwendung.'

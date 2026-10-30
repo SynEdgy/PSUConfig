@@ -81,6 +81,15 @@ Describe 'New-PSUConfigDemoConsole' {
         $englishUsersStrings = Import-PowerShellDataFile -Path $englishUsersPath
         $frenchUsersStrings = Import-PowerShellDataFile -Path $frenchUsersPath
         $germanUsersStrings = Import-PowerShellDataFile -Path $germanUsersPath
+        $englishMonitoringPath = Join-Path -Path $moduleBase -ChildPath 'en'
+        $englishMonitoringPath = Join-Path -Path $englishMonitoringPath -ChildPath 'PSUConfig.Monitoring.strings.psd1'
+        $frenchMonitoringPath = Join-Path -Path $moduleBase -ChildPath 'fr'
+        $frenchMonitoringPath = Join-Path -Path $frenchMonitoringPath -ChildPath 'PSUConfig.Monitoring.strings.psd1'
+        $germanMonitoringPath = Join-Path -Path $moduleBase -ChildPath 'de'
+        $germanMonitoringPath = Join-Path -Path $germanMonitoringPath -ChildPath 'PSUConfig.Monitoring.strings.psd1'
+        $englishMonitoringStrings = Import-PowerShellDataFile -Path $englishMonitoringPath
+        $frenchMonitoringStrings = Import-PowerShellDataFile -Path $frenchMonitoringPath
+        $germanMonitoringStrings = Import-PowerShellDataFile -Path $germanMonitoringPath
         $appPath = PSUConfig\Get-PSUConfigAppPath
         $homePath = Join-Path -Path $appPath -ChildPath 'pages'
         $homePath = Join-Path -Path $homePath -ChildPath 'Home.ps1'
@@ -91,9 +100,12 @@ Describe 'New-PSUConfigDemoConsole' {
         $jobInfoPath = Join-Path -Path $appPath -ChildPath 'pages'
         $jobInfoPath = Join-Path -Path $jobInfoPath -ChildPath 'job_info.ps1'
         $jobInfoSource = Get-Content -Path $jobInfoPath -Raw
+        $monitoringPath = Join-Path -Path $appPath -ChildPath 'pages'
+        $monitoringPath = Join-Path -Path $monitoringPath -ChildPath 'monitoring.ps1'
+        $monitoringSource = Get-Content -Path $monitoringPath -Raw
 
         $englishStrings.HeroTitle | Should -Be 'PowerShell Universal, managed as code.'
-        $frenchStrings.HeroTitle | Should -Match 'comme du code'
+        $frenchStrings.HeroTitle | Should -Match 'géré par du code'
         $frenchStrings.HeroTitle | Should -Not -Be $englishStrings.HeroTitle
         $germanStrings.HeroTitle | Should -Be 'PowerShell Universal, als Code verwaltet.'
         $englishStrings.NavigationHome | Should -Be 'Module-first demo'
@@ -107,6 +119,11 @@ Describe 'New-PSUConfigDemoConsole' {
         $frenchUsersStrings.PageEyebrow | Should -Not -Be $englishUsersStrings.PageEyebrow
         @($englishUsersStrings.Keys | Sort-Object) | Should -Be @($frenchUsersStrings.Keys | Sort-Object)
         @($englishUsersStrings.Keys | Sort-Object) | Should -Be @($germanUsersStrings.Keys | Sort-Object)
+        $englishMonitoringStrings.PageTitle | Should -Be 'SecureConnect monitoring'
+        $frenchMonitoringStrings.PageTitle | Should -Not -Be $englishMonitoringStrings.PageTitle
+        $germanMonitoringStrings.PageTitle | Should -Be 'SecureConnect-Monitoring'
+        @($englishMonitoringStrings.Keys | Sort-Object) | Should -Be @($frenchMonitoringStrings.Keys | Sort-Object)
+        @($englishMonitoringStrings.Keys | Sort-Object) | Should -Be @($germanMonitoringStrings.Keys | Sort-Object)
         $homeSource | Should -Match 'Get-PSUConfigModule'
         $homeSource | Should -Match 'Resolve-PSULocalizationLanguage'
         $homeSource | Should -Match 'Get-PSUConfigLocalizedData'
@@ -137,6 +154,18 @@ Describe 'New-PSUConfigDemoConsole' {
         $jobInfoSource | Should -Match 'New-UDPsuJobHeader @headerParameters'
         $jobInfoSource | Should -Match 'Language\s+= \$language'
         $jobInfoSource | Should -Match 'DefaultUILanguage\s+= \$defaultUILanguage'
+        $monitoringSource | Should -Match "Name\s*=\s*'PSUConfig\.Monitoring'"
+        $monitoringSource | Should -Match '\$psuConfigMonitoringStrings = Get-PSUConfigLocalizedData'
+        $monitoringSource | Should -Match 'Get-PSUConfigMonitoringComputer'
+        $monitoringSource | Should -Match 'Start-PSUConfigMonitoringAlert'
+        $monitoringSource | Should -Match 'Invoke-PSUConfigMonitoringPatch'
+        $monitoringSource | Should -Match 'Confirm-PSUConfigMonitoringNotification'
+        $monitoringSource | Should -Match 'monitoringOwnerNotified'
+        $monitoringSource | Should -Match 'monitoringOperatorApproved'
+        $monitoringSource | Should -Match "gridTemplateColumns\s*=\s*'repeat\(auto-fit, minmax\(220px, 1fr\)\)'"
+        $monitoringSource | Should -Match "New-UDIcon -Icon 'ChevronRight'"
+        $monitoringSource | Should -Match "# 'SecureConnect monitoring'"
+        $monitoringSource | Should -Not -Match "New-UDTypography\s+-Text\s+'SecureConnect monitoring'"
     }
 
     It 'Should provide a persistent language selector in the app header' {
@@ -152,9 +181,11 @@ Describe 'New-PSUConfigDemoConsole' {
         $commandSource | Should -Not -Match 'UseNativeLanguageName\s*=\s*\$true'
         $commandSource | Should -Match '\$psuConfigDemoStrings\.NavigationHome'
         $commandSource | Should -Match '\$psuConfigDemoStrings\.NavigationUsers'
+        $commandSource | Should -Match '\$psuConfigDemoStrings\.NavigationMonitoring'
         $commandSource | Should -Match "New-UDDynamic -Id 'psuconfig-navigation'"
         $commandSource | Should -Not -Match "Label\s*=\s*'Module-first demo'"
         $commandSource | Should -Not -Match "Label\s*=\s*'Users'"
+        $commandSource | Should -Not -Match "Label\s*=\s*'Monitoring'"
     }
 
     It 'Should register startup localization cache initialization' {
@@ -164,7 +195,9 @@ Describe 'New-PSUConfigDemoConsole' {
         $triggersSource = Get-Content -Path (Join-Path -Path $universalPath -ChildPath 'triggers.ps1') -Raw
 
         $scriptsSource | Should -Match "Command 'Initialize-PSUConfigLocalizationCache'"
+        $scriptsSource | Should -Match "Command 'Invoke-PSUConfigMonitoringJob'"
         $triggersSource | Should -Match "EventType\s*=\s*'ServerStarted'"
         $triggersSource | Should -Match "TriggerScript\s*=\s*'PSUConfig\\Initialize-PSUConfigLocalizationCache'"
+        $triggersSource | Should -Match "TriggerScript\s*=\s*'PSUConfig\\Initialize-PSUConfigDB'"
     }
 }

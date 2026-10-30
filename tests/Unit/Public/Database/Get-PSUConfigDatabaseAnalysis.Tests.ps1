@@ -66,7 +66,7 @@ Describe 'Get-PSUConfigDatabaseAnalysis' {
         $result.TableName | Should -Contain 'psuConfigUser'
         ($result | Where-Object -Property TableName -EQ 'psuConfigUser').RecordCount | Should -Be 1
         ($result | Where-Object -Property TableName -EQ '_metadata').RecordCount | Should -Be 1
-        $result.SchemaVersion | Select-Object -Unique | Should -Be '0.0.2'
+        $result.SchemaVersion | Select-Object -Unique | Should -Be '0.0.3'
     }
 
     It 'Should emit the startup verbose message before analysis results' {

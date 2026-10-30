@@ -17,6 +17,16 @@ function Remove-PSUConfigUser
             Removes the user record with identifier 42 without an interactive prompt.
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+    [APIEndpoint(
+        Name = 'removePSUConfigUser',
+        Path = '/psuConfigUser',
+        Description = 'Remove a PSUConfig user record from the local database.',
+        Method = 'DELETE',
+        Authentication = $false,
+        Role = ('admin','user'),
+        Tag = 'Users',
+        Timeout = 30
+    )]
     [OutputType([System.Object])]
     param
     (

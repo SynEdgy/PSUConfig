@@ -1,10 +1,11 @@
 @{
     NavigationHome                  = 'Démo modulaire'
     NavigationUsers                 = 'Utilisateurs'
+    NavigationMonitoring            = 'Supervision'
     HeroEyebrow                     = 'SYNEDGY - AUTOMATISATION MODULAIRE'
-    HeroTitle                       = 'PowerShell Universal, géré comme du code.'
+    HeroTitle                       = 'PowerShell Universal, géré par du code.'
     HeroLead                        = 'Un module PowerShell unique définit les commandes, le modèle de données, les API, les outils d''IA, les tâches, les environnements, les rôles et l''application déployés dans PSU.'
-    HeroDelivery                    = 'Sampler transforme ce dépôt en un pipeline reproductible de compilation, de test, de création de package et de déploiement conçu par SynEdgy.'
+    HeroDelivery                    = 'Sampler transforme ce dépôt en un pipeline reproductible de compilation, de test, de création de package et de déploiement.'
     RunAnalysisButton               = 'Exécuter l''analyse de la base'
     AnalysisJobIdMissing            = 'PowerShell Universal n''a pas renvoyé d''identifiant de tâche.'
     AnalysisJobStarted              = 'Tâche d''analyse de la base #{0} démarrée.'
